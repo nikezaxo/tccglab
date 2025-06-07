@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Computational Chemistry Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+    html, body {
+      height: 100%;
+      background: #000;
+      overflow-x: hidden;
+      color: #e0e0e0;
+    }
+    body {
+      padding-bottom: 40px;
+    }
+    header {
+      background: transparent;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #00f7ff;
+      position: relative;
+      z-index: 1;
+    }
+    header h1, header p {
+      color: #00f7ff;
+      font-size: 2.5rem;
+      cursor: default;
+    }
+    header p {
+      font-size: 1.2rem;
+      margin-top: 8px;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      border-bottom: 1px solid #333;
+      position: relative;
+      z-index: 1;
+    }
+    nav a {
+      color: #00f7ff;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: default;
+    }
+    nav a:hover {
+      color: #ffffff;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    section {
+      margin-bottom: 60px;
+    }
+    h2 {
+      color: #00f7ff;
+      margin-bottom: 20px;
+      cursor: default;
+    }
+    footer {
+      background: rgba(0, 0, 0, 0.8);
+      text-align: center;
+      padding: 20px;
+      color: #aaa;
+      border-top: 1px solid #333;
+      position: relative;
+      z-index: 1;
+    }
+    .map {
+      width: 100%;
+      height: 300px;
+      border: none;
+    }
+    .team-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 30px;
+      padding: 20px 0;
+    }
+    .team-member {
+      min-width: 180px;
+      background: #222;
+      border-radius: 10px;
+      text-align: center;
+      padding: 20px;
+      flex: none;
+      border: 2px solid #00f7ff;
+      transition: transform 0.3s ease;
+    }
+    .team-member:hover {
+      transform: scale(1.05);
+    }
+    .team-member img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+    .team-member p {
+      color: #fff;
+      margin-top: 10px;
+    }
+    #innovation {
+      text-align: center;
+      margin: 60px 0;
+    }
+    #innovation img {
+      width: 300px;
+      border-radius: 20px;
+      border: 2px solid #00f7ff;
+      box-shadow: 0 0 25px rgba(0, 247, 255, 0.7);
+      transition: transform 0.5s ease;
+    }
+    #innovation img:hover {
+      transform: scale(1.1);
+    }
+    .matrix-text {
+      color: #00f7ff;
+      font-size: 1.2rem;
+      padding: 20px;
+      margin-top: 30px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #00f7ff;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      white-space: pre-wrap;
+    }
+    .glow {
+      color: #00f7ff;
+      text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff, 0 0 20px #00f7ff;
+    }
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+      nav {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .team-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      #innovation img {
+        width: 80%;
+        max-width: 300px;
+      }
+      .matrix-text {
+        font-size: 1rem;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="header-title">Computational Chemistry Center</h1>
+    <p id="location-text">Zakho University, Zakho, Iraq</p>
+  </header>
+  <nav>
+    <a href="#about" data-text="About Us">About Us</a>
+    <a href="#services" data-text="Services">Services</a>
+    <a href="#team" data-text="Team">Team</a>
+    <a href="#contact" data-text="Contact">Contact</a>
+    <a href="#location" data-text="Location">Location</a>
+  </nav>
+  <div class="container">
+    <section id="about">
+      <h2 data-text="About Us">WHO WE ARE</h2>
+      <p id="about-text">We are a specialized center at Zakho University focused on computational chemistry and molecular modeling. Our mission is to provide high-quality DFT, molecular dynamics, and cheminformatics solutions for academic and industrial partners.</p>
+    </section>
+    <section id="services">
+      <h2 data-text="Our Services">Our Services</h2>
+      <ul>
+        <li data-text="Density Functional Theory (DFT) Calculations">Density Functional Theory (DFT) Calculations</li>
+        <li data-text="Molecular Dynamics Simulations">Molecular Dynamics Simulations</li>
+        <li data-text="Drug Discovery & QSAR Modeling">Drug Discovery & QSAR Modeling</li>
+        <li data-text="Binding Free Energy Calculations">Binding Free Energy Calculations</li>
+        <li data-text="Custom Computational Projects">Custom Computational Projects</li>
+      </ul>
+    </section>
+    <section id="team">
+      <h2>Our Team</h2>
+      <div class="team-container">
+        <div class="team-member">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 1" />
+          <p>Dr. Hyder A A</p>
+        </div>
+        <div class="team-member">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 2" />
+          <p>Dr. Shinwar</p>
+        </div>
+        <div class="team-member">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 3" />
+          <p>Mr. dilzhar S</p>
+        </div>
+        <div class="team-member">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 4" />
+          <p>Dev . Nihad R</p>
+        </div>
+        <div class="team-member">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Ahmad KH" />
+          <p>Ahmad KH</p>
+        </div>
+      </div>
+    </section>
+    <section id="innovation">
+      <h2>Our Innovation</h2>
+      <img src="idea.gif" alt="Innovative Idea" />
+      <div class="matrix-text">
+        At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges.
+      </div>
+    </section>
+    <section id="contact">
+      <h2>Contact Us</h2>
+      <p id="email-text" class="glow">Email: compchem@staff.uoz.edu.krd</p>
+      <p id="phone-text" class="glow">Phone: +964 750 2015912</p>
+    </section>
+    <section id="location">
+      <h2>Our Location</h2>
+      <p>Zakho University, Zakho, Iraq</p>
+      <iframe
+        class="map"
+        src="https://maps.google.com/maps?q=Zakho%20University&t=&z=13&ie=UTF8&iwloc=&output=embed"
+        allowfullscreen
+      ></iframe>
+    </section>
+  </div>
+  <footer>
+    <p>&copy; 2025 Computational Chemistry Center, Zakho University. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function scrambleEffect(el, finalText, interval = 30, cycles = 8) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*';
+      let frame = 0;
+
+      return new Promise(resolve => {
+        const scramble = () => {
+          if (frame >= finalText.length + cycles) {
+            el.textContent = finalText;
+            resolve();
+            return;
+          }
+
+          let displayText = '';
+          for (let i = 0; i < finalText.length; i++) {
+            if (i < frame - cycles) {
+              displayText += finalText[i];
+            } else if (i <= frame) {
+              displayText += chars[Math.floor(Math.random() * chars.length)];
+            } else {
+              displayText += finalText[i] === ' ' ? ' ' : '';
+            }
+          }
+          el.textContent = displayText;
+          frame++;
+          setTimeout(scramble, interval);
+        };
+        scramble();
+      });
+    }
+
+    async function applyScrambleSequence() {
+      const targets = [];
+
+      targets.push({el: document.getElementById('header-title'), text: 'Computational Chemistry Center'});
+      targets.push({el: document.getElementById('location-text'), text: 'Zakho University, Zakho, Iraq'});
+
+      document.querySelectorAll('nav a').forEach(a => {
+        targets.push({el: a, text: a.dataset.text});
+      });
+
+      targets.push({el: document.querySelector('#about h2'), text: 'About Us'});
+      targets.push({el: document.getElementById('about-text'), text: 'We are a specialized center at Zakho University focused on computational chemistry and molecular modeling. Our mission is to provide high-quality DFT, molecular dynamics, and cheminformatics solutions for academic and industrial partners.'});
+
+      targets.push({el: document.querySelector('#services h2'), text: 'Our Services'});
+      document.querySelectorAll('#services li').forEach(li => {
+        targets.push({el: li, text: li.dataset.text});
+      });
+
+      targets.push({el: document.getElementById('email-text'), text: 'Email: compchem@staff.uoz.edu.krd'});
+      targets.push({el: document.getElementById('phone-text'), text: 'Phone: +964 750 2015912'});
+
+      for (const {el, text} of targets) {
+        await scrambleEffect(el, text, 30, 8);
+        await new Promise(r => setTimeout(r, 150));
+      }
+    }
+
+    window.onload = applyScrambleSequence;
+
+    // 👇 Repeating effect every 3 seconds only for "Contact Us"
+    setInterval(() => {
+      scrambleEffect(document.querySelector('#contact h2'), 'Contact Us', 30, 8);
+    }, 3000);
+  </script>
+</body>
+</html>
