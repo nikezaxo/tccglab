@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -140,10 +140,19 @@
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
       white-space: pre-wrap;
+      min-height: 150px;
     }
     .glow {
       color: #00f7ff;
       text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff, 0 0 20px #00f7ff;
+    }
+    .matrix-symbol {
+      color: #e5f0e5;
+      font-size: 1.5rem;
+      display: inline-block;
+      margin-left: 10px;
+      transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+      opacity: 0.5;
     }
     @media (max-width: 768px) {
       header h1 {
@@ -174,29 +183,29 @@
     <p id="location-text">Zakho University, Zakho, Iraq</p>
   </header>
   <nav>
-    <a href="#about" data-text="About Us">About Us</a>
-    <a href="#services" data-text="Services">Services</a>
-    <a href="#team" data-text="Team">Team</a>
-    <a href="#contact" data-text="Contact">Contact</a>
-    <a href="#location" data-text="Location">Location</a>
+    <a href="#about">About Us</a>
+    <a href="#services">Services</a>
+    <a href="#team">Team</a>
+    <a href="#contact">Contact</a>
+    <a href="#location">Location</a>
   </nav>
   <div class="container">
     <section id="about">
-      <h2 data-text="About Us">WHO WE ARE</h2>
-      <p id="about-text">We are a specialized center at Zakho University focused on computational chemistry and molecular modeling. Our mission is to provide high-quality DFT, molecular dynamics, and cheminformatics solutions for academic and industrial partners.</p>
+      <h2 id="who-heading">WHO WE ARE</h2>
+      <p id="who-text">We are a specialized center at Zakho University focused on computational chemistry and molecular modeling. Our mission is to provide high-quality DFT, molecular dynamics, and cheminformatics solutions for academic and industrial partners.</p>
     </section>
     <section id="services">
-      <h2 data-text="Our Services">Our Services</h2>
+      <h2 id="services-heading">Our Services</h2>
       <ul>
-        <li data-text="Density Functional Theory (DFT) Calculations">Density Functional Theory (DFT) Calculations</li>
-        <li data-text="Molecular Dynamics Simulations">Molecular Dynamics Simulations</li>
-        <li data-text="Drug Discovery & QSAR Modeling">Drug Discovery & QSAR Modeling</li>
-        <li data-text="Binding Free Energy Calculations">Binding Free Energy Calculations</li>
-        <li data-text="Custom Computational Projects">Custom Computational Projects</li>
+        <li id="srv1">Density Functional Theory (DFT) Calculations</li>
+        <li id="srv2">Molecular Dynamics Simulations</li>
+        <li id="srv3">Drug Discovery & QSAR Modeling</li>
+        <li id="srv4">Binding Free Energy Calculations</li>
+        <li id="srv5">Custom Computational Projects</li>
       </ul>
     </section>
     <section id="team">
-      <h2>Our Team</h2>
+      <h2 id="team-heading">Our Team</h2>
       <div class="team-container">
         <div class="team-member">
           <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 1" />
@@ -223,12 +232,14 @@
     <section id="innovation">
       <h2>Our Innovation</h2>
       <img src="idea.gif" alt="Innovative Idea" />
-      <div class="matrix-text">
-        At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges.
+      <div
+        class="matrix-text"
+        id="matrix-effect"
+        data-text="At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges.">
       </div>
     </section>
     <section id="contact">
-      <h2>Contact Us</h2>
+      <h2>Contact Us <span class="matrix-symbol" id="matrix-symbol">⠿</span></h2>
       <p id="email-text" class="glow">Email: compchem@staff.uoz.edu.krd</p>
       <p id="phone-text" class="glow">Phone: +964 750 2015912</p>
     </section>
@@ -238,8 +249,8 @@
       <iframe
         class="map"
         src="https://maps.google.com/maps?q=Zakho%20University&t=&z=13&ie=UTF8&iwloc=&output=embed"
-        allowfullscreen
-      ></iframe>
+        allowfullscreen>
+      </iframe>
     </section>
   </div>
   <footer>
@@ -247,69 +258,80 @@
   </footer>
 
   <script>
-    function scrambleEffect(el, finalText, interval = 30, cycles = 8) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*';
-      let frame = 0;
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+    function matrixEffect(el, finalText, delay = 25, iterations = 3) {
       return new Promise(resolve => {
-        const scramble = () => {
-          if (frame >= finalText.length + cycles) {
+        let frame = 0;
+        const interval = setInterval(() => {
+          el.textContent = finalText
+            .split("")
+            .map((ch, i) => {
+              if (i > frame) return " ";
+              if (i < frame - iterations) return ch;
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join("");
+          frame++;
+          if (frame > finalText.length + iterations) {
+            clearInterval(interval);
             el.textContent = finalText;
             resolve();
-            return;
           }
-
-          let displayText = '';
-          for (let i = 0; i < finalText.length; i++) {
-            if (i < frame - cycles) {
-              displayText += finalText[i];
-            } else if (i <= frame) {
-              displayText += chars[Math.floor(Math.random() * chars.length)];
-            } else {
-              displayText += finalText[i] === ' ' ? ' ' : '';
-            }
-          }
-          el.textContent = displayText;
-          frame++;
-          setTimeout(scramble, interval);
-        };
-        scramble();
+        }, delay);
       });
     }
 
-    async function applyScrambleSequence() {
-      const targets = [];
-
-      targets.push({el: document.getElementById('header-title'), text: 'Computational Chemistry Center'});
-      targets.push({el: document.getElementById('location-text'), text: 'Zakho University, Zakho, Iraq'});
-
-      document.querySelectorAll('nav a').forEach(a => {
-        targets.push({el: a, text: a.dataset.text});
-      });
-
-      targets.push({el: document.querySelector('#about h2'), text: 'About Us'});
-      targets.push({el: document.getElementById('about-text'), text: 'We are a specialized center at Zakho University focused on computational chemistry and molecular modeling. Our mission is to provide high-quality DFT, molecular dynamics, and cheminformatics solutions for academic and industrial partners.'});
-
-      targets.push({el: document.querySelector('#services h2'), text: 'Our Services'});
-      document.querySelectorAll('#services li').forEach(li => {
-        targets.push({el: li, text: li.dataset.text});
-      });
-
-      targets.push({el: document.getElementById('email-text'), text: 'Email: compchem@staff.uoz.edu.krd'});
-      targets.push({el: document.getElementById('phone-text'), text: 'Phone: +964 750 2015912'});
-
-      for (const {el, text} of targets) {
-        await scrambleEffect(el, text, 30, 8);
-        await new Promise(r => setTimeout(r, 150));
-      }
+    async function runMatrix() {
+      await matrixEffect(document.getElementById("who-heading"), "WHO WE ARE", 25);
+      await matrixEffect(document.getElementById("who-text"), document.getElementById("who-text").textContent, 10);
+      await matrixEffect(document.getElementById("services-heading"), "Our Services", 25);
+      await matrixEffect(document.getElementById("srv1"), document.getElementById("srv1").textContent);
+      await matrixEffect(document.getElementById("srv2"), document.getElementById("srv2").textContent);
+      await matrixEffect(document.getElementById("srv3"), document.getElementById("srv3").textContent);
+      await matrixEffect(document.getElementById("srv4"), document.getElementById("srv4").textContent);
+      await matrixEffect(document.getElementById("srv5"), document.getElementById("srv5").textContent);
+      await matrixEffect(document.getElementById("team-heading"), "Our Team", 25);
     }
 
-    window.onload = applyScrambleSequence;
+    async function animateInnovationText() {
+      const innovationDiv = document.getElementById("matrix-effect");
+      const text = innovationDiv.getAttribute("data-text");
+      await matrixEffect(innovationDiv, text, 10, 3);
+    }
 
-    // 👇 Repeating effect every 3 seconds only for "Contact Us"
+    window.onload = () => {
+      runMatrix().then(() => {
+        animateInnovationText();
+      });
+    };
+
+    // Blinking matrix symbol
+    const matrixSymbol = document.getElementById("matrix-symbol");
     setInterval(() => {
-      scrambleEffect(document.querySelector('#contact h2'), 'Contact Us', 30, 8);
-    }, 3000);
+      matrixSymbol.style.opacity = matrixSymbol.style.opacity === "1" ? "0.3" : "1";
+    }, 500);
+  </script>
+
+  <!-- Vanta.js network effect scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <script>
+    VANTA.NET({
+      el: document.body,
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x00f7ff,
+      backgroundColor: 0x000000,
+      points: 15.00,
+      maxDistance: 14.00,
+      spacing: 18.00
+    });
   </script>
 </body>
 </html>
