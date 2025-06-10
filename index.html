@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -19,7 +19,7 @@
       color: #e0e0e0;
     }
     body {
-      padding-bottom: 40px;
+      padding-bottom: 160px; /* Increased padding to avoid overlap with taller chat bar */
     }
     header {
       background: transparent;
@@ -154,6 +154,93 @@
       transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
       opacity: 0.5;
     }
+    
+    /* --- AI Chat Bar Styles --- */
+    .ai-chat-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 10, 15, 0.85);
+        border-top: 2px solid #00f7ff;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        padding: 10px 20px;
+        z-index: 1000;
+        box-shadow: 0 0 20px rgba(0, 247, 255, 0.5);
+        display: flex;
+        flex-direction: column; /* Changed to column for suggestions */
+        gap: 8px;
+    }
+    .ai-chat-main {
+        display: flex;
+        width: 100%;
+        align-items: flex-start; /* Align items to the top */
+        gap: 15px;
+    }
+    .ai-chat-display {
+        flex-grow: 1;
+        color: #fff;
+        font-size: 0.9rem;
+        white-space: normal; /* Allow text to wrap */
+        word-break: break-word; /* Break long words if necessary */
+        min-height: 1.2rem; /* Give it a base height to reduce layout shift */
+    }
+    .ai-chat-display span {
+        color: #00f7ff;
+        font-weight: bold;
+        margin-right: 8px;
+    }
+    .ai-chat-input {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid #00f7ff;
+        border-radius: 5px;
+        color: #fff;
+        padding: 8px;
+        width: 250px;
+        font-family: 'Orbitron', sans-serif;
+    }
+    .ai-chat-input:focus {
+        outline: none;
+        box-shadow: 0 0 10px rgba(0, 247, 255, 0.7);
+    }
+    .ai-chat-send {
+        background: #00f7ff;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    .ai-chat-send:hover {
+        background: #fff;
+        color: #000;
+    }
+    .ai-suggestion-box {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .suggestion-btn {
+        background: transparent;
+        border: 1px solid #00f7ff;
+        color: #00f7ff;
+        padding: 4px 10px;
+        border-radius: 15px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    .suggestion-btn:hover {
+        background: #00f7ff;
+        color: #000;
+    }
+    /* --- End of AI Chat Bar Styles --- */
+
     @media (max-width: 768px) {
       header h1 {
         font-size: 1.8rem;
@@ -174,6 +261,14 @@
         font-size: 1rem;
         padding: 15px;
       }
+      .ai-chat-main {
+          flex-direction: column;
+          gap: 10px;
+      }
+      .ai-chat-input, .ai-chat-send {
+          width: 100%;
+      }
+      body { padding-bottom: 240px; } /* Increased mobile padding */
     }
   </style>
 </head>
@@ -257,6 +352,22 @@
     <p>&copy; 2025 Computational Chemistry Center, Zakho University. All rights reserved.</p>
   </footer>
 
+  <!-- AI Chat Bar -->
+  <div class="ai-chat-bar">
+      <div class="ai-chat-main">
+        <div class="ai-chat-display">
+            <span>AI:</span>
+            <span id="ai-chat-text">Initializing quantum processor...</span>
+        </div>
+        <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Ask a question...">
+        <button id="ai-chat-send" class="ai-chat-send">Send</button>
+      </div>
+      <div id="ai-suggestion-box" class="ai-suggestion-box">
+          <!-- Suggestion buttons will be injected here -->
+      </div>
+  </div>
+
+
   <script>
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -300,17 +411,144 @@
       await matrixEffect(innovationDiv, text, 10, 3);
     }
 
-    window.onload = () => {
-      runMatrix().then(() => {
-        animateInnovationText();
-      });
-    };
-
     // Blinking matrix symbol
     const matrixSymbol = document.getElementById("matrix-symbol");
     setInterval(() => {
       matrixSymbol.style.opacity = matrixSymbol.style.opacity === "1" ? "0.3" : "1";
     }, 500);
+
+    // --- AI Chat Logic ---
+    const chatTextElement = document.getElementById('ai-chat-text');
+    const chatInput = document.getElementById('ai-chat-input');
+    const chatSendButton = document.getElementById('ai-chat-send');
+    const suggestionBox = document.getElementById('ai-suggestion-box');
+    let chatterInterval;
+
+    const chatterMessages = [
+        "Analyzing molecular orbital overlaps...",
+        "Running DFT simulation on caffeine molecule...",
+        "Calibrating neural network for QSAR model...",
+        "Accessing protein data bank...",
+        "Calculating binding affinity for ligand 3B... result: -8.4 kcal/mol.",
+        "System nominal. Awaiting user input.",
+        "Considering the Schrödinger equation...",
+    ];
+
+    const suggestedQuestions = [
+        "Who are you?",
+        "Email Us",
+        "Chat on WhatsApp",
+        "What services do you offer?",
+    ];
+
+    const responses = {
+        "hello": "Hello! How can I assist with your computational chemistry query today?",
+        "dft": "Density Functional Theory (DFT) is a powerful quantum mechanical modeling method used to investigate the electronic structure of many-body systems.",
+        "services": "We offer a range of services including DFT, Molecular Dynamics, and QSAR Modeling. Please see the 'Our Services' section above for more details.",
+        "contact": "You can reach us via the email or phone number listed in the 'Contact Us' section. We look forward to hearing from you.",
+        "team": "Our team consists of experts in computational chemistry and software development, dedicated to providing top-tier research solutions.",
+        "who": "I am a virtual assistant for the Computational Chemistry Center, designed to answer basic questions about our services and team.",
+        "what are you": "I am a virtual assistant for the Computational Chemistry Center.",
+        "what you do": "I provide information about our services like DFT calculations, molecular dynamics, and drug discovery. I can also direct you to our contact information.",
+        "located": "Our center is located at Zakho University, in Zakho, Iraq. You can find a map in the 'Our Location' section.",
+        "where": "Our center is located at Zakho University, in Zakho, Iraq. You can find a map in the 'Our Location' section.",
+        "ask": "Yes, of course. Please type your question in the input box, or click one of the suggestions.",
+        "question": "Yes, of course. Please type your question in the input box, or click one of the suggestions.",
+        "email": "You can click the 'Email Us' button or send a message to compchem@staff.uoz.edu.krd.",
+        "chat": "You can click the 'Chat on WhatsApp' button to start a conversation.",
+        "whatsapp": "You can click the 'Chat on WhatsApp' button to start a conversation."
+    };
+
+    function displaySuggestions() {
+        suggestionBox.innerHTML = ''; // Clear existing suggestions
+        suggestedQuestions.forEach(q => {
+            const btn = document.createElement('button');
+            btn.className = 'suggestion-btn';
+            btn.textContent = q;
+            const qLower = q.toLowerCase();
+
+            if (qLower.includes('email')) {
+                btn.onclick = () => {
+                    window.location.href = 'mailto:compchem@staff.uoz.edu.krd';
+                };
+            } else if (qLower.includes('whatsapp')) {
+                btn.onclick = () => {
+                    // Phone number: +964 750 2015912 -> 9647502015912
+                    window.open('https://wa.me/9647502015912', '_blank');
+                };
+            } else {
+                 btn.onclick = () => {
+                    chatInput.value = q;
+                    handleUserQuery();
+                };
+            }
+            suggestionBox.appendChild(btn);
+        });
+    }
+
+    function startChatter() {
+        let i = 0;
+        chatterInterval = setInterval(() => {
+            chatTextElement.textContent = chatterMessages[i];
+            i = (i + 1) % chatterMessages.length;
+        }, 8000); // Changed to 8 seconds
+    }
+
+    function stopChatter() {
+        clearInterval(chatterInterval);
+    }
+
+    function handleUserQuery() {
+        const query = chatInput.value.toLowerCase().trim();
+        if (!query) return;
+
+        stopChatter(); // Stop the random chatter when user interacts
+
+        let responseFound = false;
+        // Check for exact matches first for more specific questions
+        for (const key in responses) {
+            if (query === key) {
+                chatTextElement.textContent = responses[key];
+                responseFound = true;
+                break;
+            }
+        }
+        // Then check for partial matches
+        if (!responseFound) {
+            for (const key in responses) {
+                if (query.includes(key)) {
+                    chatTextElement.textContent = responses[key];
+                    responseFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (!responseFound) {
+            chatTextElement.textContent = "That is a complex query. For detailed questions, please email us at compchem@staff.uoz.edu.krd.";
+        }
+
+        chatInput.value = '';
+
+        // Restart the chatter after a delay
+        setTimeout(startChatter, 10000); 
+    }
+
+    chatSendButton.addEventListener('click', handleUserQuery);
+    chatInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            handleUserQuery();
+        }
+    });
+
+    // --- Original Window Onload Logic + AI Chat Start ---
+    window.onload = () => {
+      runMatrix().then(() => {
+        animateInnovationText();
+      });
+      startChatter();
+      displaySuggestions();
+    };
   </script>
 
   <!-- Vanta.js network effect scripts -->
