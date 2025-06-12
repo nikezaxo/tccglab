@@ -56,7 +56,7 @@
       color: #00f7ff;
       text-decoration: none;
       font-weight: bold;
-      cursor: default;
+      cursor: pointer;
     }
     nav a:hover {
       color: #ffffff;
@@ -83,9 +83,24 @@
       overflow-x: auto;
       gap: 30px;
       padding: 20px 0;
+      /* Add some scrollbar styling for better look */
+      scrollbar-width: thin;
+      scrollbar-color: #00f7ff #222;
+    }
+    .team-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    .team-container::-webkit-scrollbar-track {
+        background: #222;
+    }
+    .team-container::-webkit-scrollbar-thumb {
+        background-color: #00f7ff;
+        border-radius: 10px;
+        border: 2px solid #222;
     }
     .team-member {
       min-width: 180px;
+      height: 180px; /* Set a fixed height */
       background: #222;
       border-radius: 10px;
       text-align: center;
@@ -93,20 +108,49 @@
       flex: none;
       border: 2px solid #00f7ff;
       transition: transform 0.3s ease;
-    }
-    .team-member:hover {
-      transform: scale(1.05);
+      position: relative; /* Crucial for positioning the info overlay */
+      overflow: hidden; /* Hides the part of the info box that is outside */
+      display: flex; /* Center the image */
+      justify-content: center;
+      align-items: center;
     }
     .team-member img {
-      width: 80px;
-      height: 80px;
+      width: 100px; /* Slightly larger image */
+      height: 100px;
       border-radius: 50%;
-      margin-bottom: 10px;
+      margin-bottom: 0; /* Remove margin as it's now centered */
+      transition: transform 0.4s ease-in-out, filter 0.4s ease-in-out;
     }
-    .team-member p {
-      color: #fff;
-      margin-top: 10px;
+    .team-member:hover img {
+        transform: scale(0.9) translateY(-10px); /* Move image up and shrink slightly on hover */
+        filter: brightness(0.7);
     }
+    .team-member-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 247, 255, 0.9);
+        color: #000;
+        padding: 10px;
+        text-align: center;
+        transform: translateY(100%); /* Start fully translated down (hidden) */
+        transition: transform 0.4s ease-in-out;
+    }
+    .team-member:hover .team-member-info {
+        transform: translateY(0); /* Slide up into view */
+    }
+    .member-name {
+        font-weight: bold;
+        font-size: 1rem;
+        margin: 0;
+    }
+    .member-degree {
+        font-size: 0.8rem;
+        margin: 5px 0 0 0;
+        color: #111;
+    }
+
     #innovation {
       text-align: center;
       margin: 60px 0;
@@ -146,7 +190,7 @@
       opacity: 0.5;
     }
     
-    /* --- New Chatbot Icon and Modal Styles --- */
+    /* --- Chatbot Icon and Modal Styles --- */
     .chat-icon {
         position: fixed;
         bottom: 30px;
@@ -234,8 +278,7 @@
         border: none;
         border-radius: 8px;
     }
-    /* --- End of New Chatbot Styles --- */
-
+    
     /* --- Footer & Map --- */
     footer {
       background: rgba(0, 0, 0, 0.8);
@@ -265,6 +308,22 @@
         flex-direction: column;
         align-items: center;
       }
+      /* Styles for smaller team cards on mobile */
+      .team-member {
+        min-width: 160px;
+        height: 160px;
+      }
+      .team-member img {
+        width: 80px;
+        height: 80px;
+      }
+      .member-name {
+        font-size: 0.9rem;
+      }
+      .member-degree {
+        font-size: 0.75rem;
+      }
+
       #innovation img {
         width: 80%;
         max-width: 300px;
@@ -324,25 +383,45 @@
     <section id="team">
       <h2 id="team-heading">Our Team</h2>
       <div class="team-container">
+        <!-- Team Member 1 -->
         <div class="team-member">
-          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 1" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Dr.H';"/>
-          <p>Dr. Hyder A A</p>
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Dr. Hyder A A" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Dr.H';"/>
+          <div class="team-member-info">
+            <p class="member-name">Dr. Hyder A A</p>
+            <p class="member-degree">Ph.D. in Chemistry</p>
+          </div>
         </div>
+        <!-- Team Member 2 -->
         <div class="team-member">
-          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 2" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Dr.S';"/>
-          <p>Dr. Shinwar</p>
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Dr. Shinwar" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Dr.S';"/>
+          <div class="team-member-info">
+            <p class="member-name">Dr. Shinwar</p>
+            <p class="member-degree">Ph.D. in Physics</p>
+          </div>
         </div>
+        <!-- Team Member 3 -->
         <div class="team-member">
-          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 3" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Mr.D';"/>
-          <p>Mr. dilzhar S</p>
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Mr. dilzhar S" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Mr.D';"/>
+          <div class="team-member-info">
+            <p class="member-name">Mr. dilzhar S</p>
+            <p class="member-degree">M.Sc. in Comp. Chem.</p>
+          </div>
         </div>
+        <!-- Team Member 4 -->
         <div class="team-member">
-          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Person 4" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Dev.N';"/>
-          <p>Dev . Nihad R</p>
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Dev . Nihad R" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=Dev.N';"/>
+           <div class="team-member-info">
+            <p class="member-name">Dev. Nihad R</p>
+            <p class="member-degree">B.Sc. in Comp. Sci.</p>
+          </div>
         </div>
+        <!-- Team Member 5 -->
         <div class="team-member">
           <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Ahmad KH" onerror="this.onerror=null;this.src='https://placehold.co/80x80/222/00f7ff?text=A.KH';"/>
-          <p>Ahmad KH</p>
+           <div class="team-member-info">
+            <p class="member-name">Ahmad KH</p>
+            <p class="member-degree">Research Assistant</p>
+          </div>
         </div>
       </div>
     </section>
