@@ -18,6 +18,7 @@
       background: #000;
       overflow-x: hidden;
       color: #e0e0e0;
+      scroll-behavior: smooth;
     }
     body {
       padding-bottom: 80px; /* Space for footer */
@@ -83,7 +84,6 @@
       overflow-x: auto;
       gap: 30px;
       padding: 20px 0;
-      /* Add some scrollbar styling for better look */
       scrollbar-width: thin;
       scrollbar-color: #00f7ff #222;
     }
@@ -100,31 +100,22 @@
     }
     .team-member {
       min-width: 180px;
-      height: 180px; /* Set a fixed height */
+      height: 180px;
       background: #222;
       border-radius: 10px;
-      text-align: center;
-      padding: 20px;
       flex: none;
       border: 2px solid #00f7ff;
       transition: transform 0.3s ease;
-      position: relative; /* Crucial for positioning the info overlay */
-      overflow: hidden; /* Hides the part of the info box that is outside */
-      display: flex; /* Center the image */
-      justify-content: center;
-      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0; /* Removed padding to allow image to fill */
     }
     .team-member img {
-      width: 150px; /* Slightly larger image */
-      height: 150px;
-      border-radius: 50%;
-      margin-bottom: 0; /* Remove margin as it's now centered */
-      transition: transform 0.4s ease-in-out, filter 0.4s ease-in-out;
-      object-fit: cover; /* Ensures the image covers the area without distortion */
-    }
-    .team-member:hover img {
-        transform: scale(0.9) translateY(-10px); /* Move image up and shrink slightly on hover */
-        filter: brightness(0.7);
+      width: 100%; /* Image fills the container */
+      height: 100%;
+      border-radius: 8px; /* Match the parent's border radius */
+      transition: filter 0.4s ease-in-out;
+      object-fit: cover;
     }
     .team-member-info {
         position: absolute;
@@ -135,11 +126,10 @@
         color: #000;
         padding: 10px;
         text-align: center;
-        transform: translateY(100%); /* Start fully translated down (hidden) */
+        transform: translateY(100%); /* Start hidden */
         transition: transform 0.4s ease-in-out;
-    }
-    .team-member:hover .team-member-info {
-        transform: translateY(0); /* Slide up into view */
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
     }
     .member-name {
         font-weight: bold;
@@ -210,7 +200,6 @@
     }
     .chat-icon:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 30px rgba(0, 247, 255, 0.9), 0 0 15px #00f7ff inset;
     }
     .chat-icon svg {
         width: 32px;
@@ -218,7 +207,7 @@
         fill: #000;
     }
     .chatbot-modal {
-        display: none; /* Hidden by default */
+        display: none;
         position: fixed;
         z-index: 1001;
         left: 0;
@@ -261,16 +250,11 @@
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
-        transition: color 0.3s;
     }
-    .close-chatbot:hover {
-        color: #fff;
-    }
+    .close-chatbot:hover { color: #fff; }
     .chatbot-iframe-container {
         flex-grow: 1;
         padding: 5px;
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
         overflow: hidden;
     }
     .chatbot-iframe-container iframe {
@@ -297,6 +281,17 @@
     }
 
     /* --- Responsive Media Queries --- */
+
+    /* Desktop hover effect */
+    @media (min-width: 769px) {
+        .team-member:hover .team-member-info {
+            transform: translateY(0);
+        }
+        .team-member:hover img {
+            filter: brightness(0.7);
+        }
+    }
+
     @media (max-width: 768px) {
       header h1 {
         font-size: 1.8rem;
@@ -308,21 +303,24 @@
       .team-container {
         flex-direction: column;
         align-items: center;
+        overflow-x: hidden; /* No horizontal scroll on mobile */
       }
-      /* Styles for smaller team cards on mobile */
       .team-member {
-        min-width: 160px;
-        height: 160px;
-      }
-      .team-member img {
-        width: 80px;
-        height: 80px;
+        min-width: 250px; /* Make cards wider on mobile */
+        height: 250px;
       }
       .member-name {
-        font-size: 0.9rem;
+        font-size: 1.1rem;
       }
       .member-degree {
-        font-size: 0.75rem;
+        font-size: 0.9rem;
+      }
+      /* Mobile scroll-into-view effect */
+      .team-member.is-visible .team-member-info {
+        transform: translateY(0);
+      }
+      .team-member.is-visible img {
+        filter: brightness(0.7);
       }
 
       #innovation img {
@@ -384,41 +382,36 @@
     <section id="team">
       <h2 id="team-heading">Our Team</h2>
       <div class="team-container">
-        <!-- Team Member 1 -->
         <div class="team-member">
-          <img src="hyder.jpeg" alt="Dr. Hyder A A" onerror="this.onerror=null;this.src='https://placehold.co/100x100/222/00f7ff?text=Dr.H';"/>
+          <img src="hyder.jpeg" alt="Dr. Hyder A A" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Dr.+Hyder'"/>
           <div class="team-member-info">
             <p class="member-name">Dr. Hyder A A</p>
             <p class="member-degree">Ph.D. in Chemistry</p>
           </div>
         </div>
-        <!-- Team Member 2 -->
         <div class="team-member">
-          <img src="shinwar.jpeg" alt="Dr. Shinwar" onerror="this.onerror=null;this.src='https://placehold.co/100x100/222/00f7ff?text=Dr.S';"/>
+          <img src="shinwar.jpeg" alt="Dr. Shinwar" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Dr.+Shinwar'"/>
           <div class="team-member-info">
             <p class="member-name">Dr. Shinwar</p>
             <p class="member-degree">Ph.D. in Physics</p>
           </div>
         </div>
-        <!-- Team Member 3 -->
         <div class="team-member">
-          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Mr. dilzhar S" onerror="this.onerror=null;this.src='https://placehold.co/100x100/222/00f7ff?text=Mr.D';"/>
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Mr. dilzhar S" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Mr.+Dilzhar'"/>
           <div class="team-member-info">
             <p class="member-name">Mr. dilzhar S</p>
             <p class="member-degree">M.Sc. in Comp. Chem.</p>
           </div>
         </div>
-        <!-- Team Member 4 -->
         <div class="team-member">
-          <img src="nihad.jpeg" alt="Dev . Nihad R" onerror="this.onerror=null;this.src='https://placehold.co/100x100/222/00f7ff?text=Dev.N';"/>
+          <img src="nihad.jpeg" alt="Dev . Nihad R" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Dev.+Nihad'"/>
            <div class="team-member-info">
             <p class="member-name">Dev. Nihad R</p>
             <p class="member-degree">B.Sc. in Comp. Sci.</p>
           </div>
         </div>
-        <!-- Team Member 5 -->
         <div class="team-member">
-          <img src="ahmad.jpeg" alt="Ahmad KH" onerror="this.onerror=null;this.src='https://placehold.co/100x100/222/00f7ff?text=A.KH';"/>
+          <img src="ahmad.jpeg" alt="Ahmad KH" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Ahmad+KH'"/>
            <div class="team-member-info">
             <p class="member-name">Ahmad KH</p>
             <p class="member-degree">Research Assistant</p>
@@ -430,11 +423,7 @@
     <section id="innovation">
       <h2>Our Innovation</h2>
       <img src="idea.gif" alt="Innovative Idea" />
-      <div
-        class="matrix-text"
-        id="matrix-effect"
-        data-text="At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges.">
-      </div>
+      <div class="matrix-text" id="matrix-effect" data-text="At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges."></div>
     </section>
     
     <section id="contact">
@@ -446,11 +435,7 @@
     <section id="location">
       <h2>Our Location</h2>
       <p>Zakho University, Zakho, Iraq</p>
-      <iframe
-        class="map"
-        src="https://maps.google.com/maps?q=Zakho%20University&t=&z=13&ie=UTF8&iwloc=&output=embed"
-        allowfullscreen>
-      </iframe>
+      <iframe class="map" src="https://maps.google.com/maps?q=Zakho%20University&t=&z=13&ie=UTF8&iwloc=&output=embed" allowfullscreen></iframe>
     </section>
   </div>
   
@@ -459,9 +444,8 @@
     <p>© 2025 Computational Chemistry Center, Zakho University. All rights reserved.</p>
   </footer>
 
-  <!-- New Chatbot Button and Modal -->
+  <!-- Chatbot Button and Modal -->
   <div id="chat-icon" class="chat-icon">
-      <!-- SVG icon for chat -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
   </div>
 
@@ -472,11 +456,7 @@
               <span id="close-chatbot" class="close-chatbot">&times;</span>
           </div>
           <div class="chatbot-iframe-container">
-              <!-- The Chatbase iframe is placed here -->
-              <iframe
-                  src="https://www.chatbase.co/chatbot-iframe/7nAceRz4VtIakEojiLmW3"
-                  title="Chatbot">
-              </iframe>
+              <iframe src="https://www.chatbase.co/chatbot-iframe/7nAceRz4VtIakEojiLmW3" title="Chatbot"></iframe>
           </div>
       </div>
   </div>
@@ -490,14 +470,11 @@
       return new Promise(resolve => {
         let frame = 0;
         const interval = setInterval(() => {
-          el.textContent = finalText
-            .split("")
-            .map((ch, i) => {
+          el.textContent = finalText.split("").map((ch, i) => {
               if (i > frame) return " ";
               if (i < frame - iterations) return ch;
               return chars[Math.floor(Math.random() * chars.length)];
-            })
-            .join("");
+            }).join("");
           frame++;
           if (frame > finalText.length + iterations) {
             clearInterval(interval);
@@ -512,7 +489,6 @@
       await matrixEffect(document.getElementById("who-heading"), "WHO WE ARE", 25);
       await matrixEffect(document.getElementById("who-text"), document.getElementById("who-text").textContent, 10);
       await matrixEffect(document.getElementById("services-heading"), "Our Services", 25);
-      // Sequentially animate service list items for a better effect
       const services = document.querySelectorAll("#services li");
       for(const service of services) {
         await matrixEffect(service, service.textContent);
@@ -526,28 +502,47 @@
       await matrixEffect(innovationDiv, text, 10, 3);
     }
 
-    // Blinking matrix symbol in the contact section
+    // --- Mobile Scroll Animation for Team Section ---
+    function setupScrollAnimation() {
+        const teamMembers = document.querySelectorAll('.team-member');
+        
+        // This threshold logic is for mobile view only
+        if (window.innerWidth <= 768) {
+            const observerOptions = {
+                root: null, // relative to the viewport
+                rootMargin: '0px',
+                threshold: 0.5 // Trigger when 50% of the element is visible
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        entry.target.classList.remove('is-visible');
+                    }
+                });
+            }, observerOptions);
+
+            teamMembers.forEach(member => {
+                observer.observe(member);
+            });
+        }
+    }
+
+    // Blinking matrix symbol
     const matrixSymbol = document.getElementById("matrix-symbol");
     setInterval(() => {
       matrixSymbol.style.opacity = matrixSymbol.style.opacity === "1" ? "0.3" : "1";
     }, 500);
     
-    // --- New Chatbot Modal Logic ---
+    // --- Chatbot Modal Logic ---
     const chatIcon = document.getElementById('chat-icon');
     const chatbotModal = document.getElementById('chatbot-modal');
     const closeChatbotButton = document.getElementById('close-chatbot');
 
-    // Show the modal when the icon is clicked
-    chatIcon.addEventListener('click', () => {
-        chatbotModal.style.display = 'block';
-    });
-
-    // Hide the modal when the close button is clicked
-    closeChatbotButton.addEventListener('click', () => {
-        chatbotModal.style.display = 'none';
-    });
-
-    // Hide the modal if the user clicks on the background overlay
+    chatIcon.addEventListener('click', () => { chatbotModal.style.display = 'block'; });
+    closeChatbotButton.addEventListener('click', () => { chatbotModal.style.display = 'none'; });
     window.addEventListener('click', (event) => {
         if (event.target == chatbotModal) {
             chatbotModal.style.display = 'none';
@@ -555,11 +550,9 @@
     });
 
     // --- Window Onload Logic ---
-    // This function runs after the entire page has loaded
     window.onload = () => {
-      runMatrix().then(() => {
-        animateInnovationText();
-      });
+      runMatrix().then(() => animateInnovationText());
+      setupScrollAnimation(); // Activate scroll animations
     };
   </script>
 
