@@ -163,33 +163,21 @@
     /* New styles for innovation images container */
     .innovation-images-container {
         display: flex;
-        overflow-x: auto; /* Enable horizontal scrolling */
+        overflow-x: hidden; /* Hide scrollbar, JavaScript will handle scrolling */
         gap: 30px;
         padding: 20px 0;
-        justify-content: center; /* Center items when there's space */
+        justify-content: flex-start; /* Align items to start for continuous scroll */
         align-items: center;
-        scrollbar-width: thin;
-        scrollbar-color: #00f7ff #222;
         margin-top: 20px;
-    }
-    .innovation-images-container::-webkit-scrollbar {
-        height: 8px;
-    }
-    .innovation-images-container::-webkit-scrollbar-track {
-        background: #222;
-    }
-    .innovation-images-container::-webkit-scrollbar-thumb {
-        background-color: #00f7ff;
-        border-radius: 10px;
-        border: 2px solid #222;
+        position: relative; /* For animation */
+        white-space: nowrap; /* Prevent items from wrapping */
     }
 
     /* Styles for individual innovation images */
     .innovation-image {
-      width: 250px; /* Set a fixed width */
-      height: 180px; /* Set a fixed height to make them all the same size */
+      width: 250px; /* Set a fixed width for desktop */
+      height: 180px; /* Set a fixed height for desktop */
       border-radius: 20px;
-      /* Removed border and box-shadow from here, handled by pseudo-element */
       box-shadow: inset 0 0 5px rgba(0, 247, 255, 0.3); /* Subtle inner shadow */
       transition: transform 0.5s ease, opacity 0.8s ease; /* Added opacity to transition */
       object-fit: cover; /* Use cover to fill the space, cropping if necessary */
@@ -198,6 +186,7 @@
       cursor: pointer; /* Indicate it's clickable */
       position: relative; /* Needed for pseudo-element positioning */
       overflow: hidden; /* Crucial to clip the pseudo-element */
+      flex-shrink: 0; /* Prevent images from shrinking */
 
       /* Initial state for slide-in effect */
       opacity: 0;
@@ -352,7 +341,7 @@
         background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
         backdrop-filter: blur(8px); /* Blur effect */
         -webkit-backdrop-filter: blur(8px);
-        display: flex; /* Use flexbox for centering */
+        /* Removed display: flex from here, it's set by JS when opened */
         justify-content: center;
         align-items: center;
     }
@@ -431,14 +420,16 @@
       .team-member.is-visible img {
         filter: brightness(0.7);
       }
+      /* Mobile adjustments for innovation images */
       .innovation-images-container {
-        flex-wrap: wrap; /* Allow images to wrap on smaller screens */
-        justify-content: center;
+        flex-wrap: nowrap; /* Force horizontal layout on mobile */
+        overflow-x: hidden; /* Hide scrollbar for auto-circulating effect */
+        justify-content: flex-start; /* Align to start for continuous scroll */
       }
       .innovation-image {
-        width: 80%;
-        max-width: 300px;
-        height: 200px; /* Maintain fixed height on mobile too */
+        width: 150px; /* Smaller width for mobile */
+        height: 100px; /* Smaller height for mobile */
+        padding: 5px; /* Smaller padding */
         min-width: unset; /* Remove min-width for mobile */
       }
       .matrix-text {
@@ -564,7 +555,7 @@
     
     <section id="innovation">
       <h2>Our Innovation</h2>
-      <div class="innovation-images-container">
+      <div class="innovation-images-container" id="innovation-carousel">
         <!-- Original image -->
         <img src="idea.png" alt="Innovative Idea" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+GIF'"/>
         <!-- New images -->
@@ -591,9 +582,9 @@
   
   <!-- Page Footer -->
   <footer>
-  <div style="text-align: center;">
-    © 2025 Computational Chemistry Center, Zakho University. All rights reserved.
-</div>
+    <div style="text-align: center;">
+      <p>© 2025 Computational Chemistry Center, Zakho University. All rights reserved.</p>
+    </div>
   </footer>
 
   <!-- Chatbot Button and Modal -->
@@ -779,9 +770,9 @@
     const fullImageModal = document.getElementById("fullImageModal");
     const fullImage = document.getElementById("img01");
     const closeFullImageModal = document.getElementsByClassName("close-full-image-modal")[0];
-    const innovationImages = document.querySelectorAll('.innovation-image'); // Re-select to ensure all are covered
+    const innovationImagesElements = document.querySelectorAll('.innovation-image'); // Renamed to avoid conflict
 
-    innovationImages.forEach(image => {
+    innovationImagesElements.forEach(image => {
         image.addEventListener('click', function() {
             fullImageModal.style.display = "flex"; // Use flex to center content
             fullImage.src = this.src; // Set the source to the clicked image's source
@@ -802,6 +793,69 @@
         }
     });
 
+    // --- Automatic Horizontal Scroll for Innovation Images ---
+    function autoScrollInnovationImages() {
+        const container = document.getElementById('innovation-carousel');
+        if (!container) return; // Exit if container not found
+
+        let scrollAmount = 0;
+        const scrollSpeed = 0.5; // Adjust speed as needed (pixels per frame)
+        let animationFrameId;
+
+        const scroll = () => {
+            container.scrollLeft += scrollSpeed;
+
+            // If scrolled to the end, reset to beginning (loop)
+            if (container.scrollLeft >= (container.scrollWidth - container.clientWidth)) {
+                container.scrollLeft = 0;
+            }
+            animationFrameId = requestAnimationFrame(scroll);
+        };
+
+        // Start scrolling when the container is visible
+        const carouselObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!animationFrameId) { // Only start if not already running
+                        scroll();
+                    }
+                } else {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                }
+            });
+        }, { threshold: 0.1 }); // Observe when 10% of the carousel is visible
+
+        carouselObserver.observe(container);
+
+        // Optional: Pause on hover/touch
+        container.addEventListener('mouseenter', () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        });
+        container.addEventListener('mouseleave', () => {
+            if (!animationFrameId) { // Only restart if not already running
+                scroll();
+            }
+        });
+        // For touch devices
+        container.addEventListener('touchstart', () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        });
+        container.addEventListener('touchend', () => {
+            if (!animationFrameId) { // Only restart if not already running
+                scroll();
+            }
+        });
+    }
+
 
     // --- Window Onload Logic ---
     window.onload = () => {
@@ -809,6 +863,7 @@
       setupTeamScrollAnimation();
       setupGlitchEffect(); // Activate the new glitch animation
       setupInnovationImageScrollEffect(); // Activate the new innovation image scroll effect
+      autoScrollInnovationImages(); // Activate automatic horizontal scroll
     };
   </script>
 
