@@ -16,7 +16,7 @@
     html, body {
       height: 100%;
       background: #000;
-      overflow-x: hidden;
+      overflow-x: hidden; /* Keep this for overall page, but allow internal scroll */
       color: #e0e0e0;
       scroll-behavior: smooth;
     }
@@ -159,16 +159,89 @@
       text-align: center;
       margin: 60px 0;
     }
-    #innovation img {
-      width: 300px;
+
+    /* New styles for innovation images container */
+    .innovation-images-container {
+        display: flex;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        gap: 30px;
+        padding: 20px 0;
+        justify-content: center; /* Center items when there's space */
+        align-items: center;
+        scrollbar-width: thin;
+        scrollbar-color: #00f7ff #222;
+        margin-top: 20px;
+    }
+    .innovation-images-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    .innovation-images-container::-webkit-scrollbar-track {
+        background: #222;
+    }
+    .innovation-images-container::-webkit-scrollbar-thumb {
+        background-color: #00f7ff;
+        border-radius: 10px;
+        border: 2px solid #222;
+    }
+
+    /* Styles for individual innovation images */
+    .innovation-image {
+      width: 250px; /* Set a fixed width */
+      height: 180px; /* Set a fixed height to make them all the same size */
       border-radius: 20px;
-      border: 2px solid #00f7ff;
-      box-shadow: 0 0 25px rgba(0, 247, 255, 0.7);
-      transition: transform 0.5s ease;
+      /* Removed border and box-shadow from here, handled by pseudo-element */
+      box-shadow: inset 0 0 5px rgba(0, 247, 255, 0.3); /* Subtle inner shadow */
+      transition: transform 0.5s ease, opacity 0.8s ease; /* Added opacity to transition */
+      object-fit: cover; /* Use cover to fill the space, cropping if necessary */
+      padding: 10px; /* Add some padding inside the border */
+      background-color: rgba(0, 0, 0, 0.5); /* Background for transparent GIFs */
+      cursor: pointer; /* Indicate it's clickable */
+      position: relative; /* Needed for pseudo-element positioning */
+      overflow: hidden; /* Crucial to clip the pseudo-element */
+
+      /* Initial state for slide-in effect */
+      opacity: 0;
+      transform: translateX(100px); /* Start off-screen to the right */
     }
-    #innovation img:hover {
-      transform: scale(1.1);
+
+    .innovation-image::before {
+      content: '';
+      position: absolute;
+      top: -5px; /* Adjust to control border thickness and glow spread */
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      z-index: -1; /* Place behind the image */
+      border-radius: 25px; /* Slightly larger than image border-radius for the glow */
+      background: linear-gradient(45deg, #000000, #00f7ff, #000000); /* Gradient for the light */
+      background-size: 300% 300%; /* Make gradient larger for movement */
+      animation: border-light-move 4s linear infinite; /* Animation definition */
+      filter: blur(8px); /* Blur for the glowing effect */
+      opacity: 0.7; /* Make the glow slightly transparent */
     }
+
+    /* Keyframes for the moving light animation */
+    @keyframes border-light-move {
+      0% {
+        background-position: 0% 0%;
+      }
+      50% {
+        background-position: 100% 100%;
+      }
+      100% {
+        background-position: 0% 0%;
+      }
+    }
+
+    .innovation-image.is-visible {
+        opacity: 1;
+        transform: translateX(0); /* Slide into view */
+    }
+
+    .innovation-image:hover {
+      transform: scale(1.05); /* Slightly less aggressive hover scale */
+    }
+
     .matrix-text {
       color: #00f7ff;
       font-size: 1.2rem;
@@ -265,32 +338,58 @@
         cursor: pointer;
     }
     .close-chatbot:hover { color: #fff; }
-    .chatbot-iframe-container {
-        flex-grow: 1;
-        padding: 5px;
-        overflow: hidden;
+
+    /* --- Full Image Modal Styles --- */
+    .full-image-modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 2000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        backdrop-filter: blur(8px); /* Blur effect */
+        -webkit-backdrop-filter: blur(8px);
+        display: flex; /* Use flexbox for centering */
+        justify-content: center;
+        align-items: center;
     }
-    .chatbot-iframe-container iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        border-radius: 8px;
+
+    .full-image-modal-content {
+        margin: auto;
+        display: block;
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain; /* Ensure image fits within bounds */
+        border: 3px solid #00f7ff;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0, 247, 255, 0.8);
+        transition: transform 0.3s ease-out;
     }
-    
-    /* --- Footer & Map --- */
-    footer {
-      background: rgba(0, 0, 0, 0.8);
-      text-align: center;
-      padding: 20px;
-      color: #aaa;
-      border-top: 1px solid #333;
-      position: relative;
-      z-index: 1;
+
+    .full-image-modal-content.zoomed {
+        transform: scale(1.1); /* Slight zoom effect when opened */
     }
-    .map {
-      width: 100%;
-      height: 300px;
-      border: none;
+
+    .close-full-image-modal {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #00f7ff;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+        text-shadow: 0 0 10px #00f7ff;
+    }
+
+    .close-full-image-modal:hover,
+    .close-full-image-modal:focus {
+        color: #fff;
+        text-decoration: none;
+        cursor: pointer;
     }
 
     /* --- Responsive Media Queries --- */
@@ -332,9 +431,15 @@
       .team-member.is-visible img {
         filter: brightness(0.7);
       }
-      #innovation img {
+      .innovation-images-container {
+        flex-wrap: wrap; /* Allow images to wrap on smaller screens */
+        justify-content: center;
+      }
+      .innovation-image {
         width: 80%;
         max-width: 300px;
+        height: 200px; /* Maintain fixed height on mobile too */
+        min-width: unset; /* Remove min-width for mobile */
       }
       .matrix-text {
         font-size: 1rem;
@@ -350,6 +455,34 @@
       .chat-icon {
         bottom: 20px;
         right: 20px;
+      }
+      .full-image-modal-content {
+        max-width: 95%;
+        max-height: 85%;
+      }
+      .close-full-image-modal {
+        font-size: 30px;
+        top: 10px;
+        right: 20px;
+      }
+    }
+
+    /* Centering and sizing for Location section */
+    #location {
+      text-align: center; /* Center content within the section */
+    }
+
+    .map {
+      width: 100%; /* Make map fill its container width */
+      height: 400px; /* Increase map height */
+      border: none;
+      margin: 20px auto 0 auto; /* Center map horizontally and add top margin */
+      display: block; /* Ensure it behaves as a block element for margin: auto */
+    }
+
+    @media (max-width: 768px) {
+      .map {
+        height: 300px; /* Adjust map height for smaller screens */
       }
     }
   </style>
@@ -431,7 +564,15 @@
     
     <section id="innovation">
       <h2>Our Innovation</h2>
-      <img src="idea.gif" alt="Innovative Idea" />
+      <div class="innovation-images-container">
+        <!-- Original image -->
+        <img src="idea.png" alt="Innovative Idea" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+GIF'"/>
+        <!-- New images -->
+        <img src="idea1.gif" alt="Innovative Idea 1" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+1+GIF'"/>
+        <img src="idea2.png" alt="Innovative Idea 2" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+2+PNG'"/>
+        <img src="idea3.png" alt="Innovative Idea 3" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+3+PNG'"/>
+        <img src="idea4.png" alt="Innovative Idea 4" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+4+PNG'"/>
+      </div>
       <div class="matrix-text" id="matrix-effect" data-text="At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges."></div>
     </section>
     
@@ -442,7 +583,7 @@
     </section>
     
     <section id="location">
-      <h2>Our Location</h2>
+      <h2>meet us personally</h2>
       <p>Zakho University, Zakho, Iraq</p>
       <iframe class="map" src="https://maps.google.com/maps?q=Zakho%20University&t=&z=13&ie=UTF8&iwloc=&output=embed" allowfullscreen></iframe>
     </section>
@@ -450,7 +591,9 @@
   
   <!-- Page Footer -->
   <footer>
-    <p>© 2025 Computational Chemistry Center, Zakho University. All rights reserved.</p>
+  <div style="text-align: center;">
+    © 2025 Computational Chemistry Center, Zakho University. All rights reserved.
+</div>
   </footer>
 
   <!-- Chatbot Button and Modal -->
@@ -468,6 +611,12 @@
               <iframe src="https://www.chatbase.co/chatbot-iframe/7nAceRz4VtIakEojiLmW3" title="Chatbot"></iframe>
           </div>
       </div>
+  </div>
+
+  <!-- Full Image Modal (Lightbox) -->
+  <div id="fullImageModal" class="full-image-modal">
+    <span class="close-full-image-modal">&times;</span>
+    <img class="full-image-modal-content" id="img01">
   </div>
 
 
@@ -555,7 +704,7 @@
     }
 
     // --- Mobile Scroll Animation for Team Section ---
-    function setupScrollAnimation() {
+    function setupTeamScrollAnimation() {
         const teamMembers = document.querySelectorAll('.team-member');
         
         if (window.innerWidth <= 768) {
@@ -581,6 +730,32 @@
         }
     }
 
+    // --- New Scroll Slide Right Effect for Innovation Images ---
+    function setupInnovationImageScrollEffect() {
+        const innovationImages = document.querySelectorAll('.innovation-image');
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.2 // Trigger when 20% of the image is visible
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Optional: Stop observing once it's visible to prevent re-triggering
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        innovationImages.forEach(image => {
+            observer.observe(image);
+        });
+    }
+
+
     // Blinking matrix symbol
     const matrixSymbol = document.getElementById("matrix-symbol");
     setInterval(() => {
@@ -600,11 +775,40 @@
         }
     });
 
+    // --- Full Image Modal (Lightbox) Logic ---
+    const fullImageModal = document.getElementById("fullImageModal");
+    const fullImage = document.getElementById("img01");
+    const closeFullImageModal = document.getElementsByClassName("close-full-image-modal")[0];
+    const innovationImages = document.querySelectorAll('.innovation-image'); // Re-select to ensure all are covered
+
+    innovationImages.forEach(image => {
+        image.addEventListener('click', function() {
+            fullImageModal.style.display = "flex"; // Use flex to center content
+            fullImage.src = this.src; // Set the source to the clicked image's source
+            fullImage.classList.add('zoomed'); // Add zoom effect
+            // Remove zoom class after animation to prepare for next open
+            setTimeout(() => fullImage.classList.remove('zoomed'), 300); 
+        });
+    });
+
+    closeFullImageModal.addEventListener('click', function() {
+        fullImageModal.style.display = "none";
+    });
+
+    // Close the modal if user clicks outside the image content
+    fullImageModal.addEventListener('click', function(event) {
+        if (event.target === fullImageModal) {
+            fullImageModal.style.display = "none";
+        }
+    });
+
+
     // --- Window Onload Logic ---
     window.onload = () => {
       runMatrix().then(() => animateInnovationText());
-      setupScrollAnimation();
+      setupTeamScrollAnimation();
       setupGlitchEffect(); // Activate the new glitch animation
+      setupInnovationImageScrollEffect(); // Activate the new innovation image scroll effect
     };
   </script>
 
