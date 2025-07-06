@@ -181,37 +181,52 @@
       background-color: rgba(0, 0, 0, 0.5); /* Background for transparent GIFs */
       cursor: pointer; /* Indicate it's clickable */
       position: relative; /* Needed for pseudo-element positioning */
-      overflow: hidden; /* Crucial to clip the pseudo-element */
+      overflow: hidden; /* Crucial to clip the pseudo-element and scanline */
       flex-shrink: 0; /* Prevent images from shrinking */
-      /* No direct border here, the animated line will act as the border */
       
       /* Initial state for slide-in effect */
       opacity: 0;
       transform: translateX(100px); /* Start off-screen to the right */
-      transition: transform 0.5s ease, opacity 0.8s ease; /* Added opacity to transition */
+      transition: transform 0.5s ease, opacity 0.8s ease, box-shadow 0.3s ease; /* Added box-shadow to transition */
+
+      /* Pulsating glow effect */
+      box-shadow: 0 0 10px rgba(0, 247, 255, 0.5), 0 0 20px rgba(0, 247, 255, 0.3);
+      animation: pulsating-glow 2s infinite alternate; /* New pulsating glow animation */
     }
 
-    /* Animated line border for innovation images (::before) */
-    .innovation-image::before {
+    /* Keyframes for pulsating glow */
+    @keyframes pulsating-glow {
+      0% {
+        box-shadow: 0 0 10px rgba(0, 247, 255, 0.5), 0 0 20px rgba(0, 247, 255, 0.3);
+      }
+      100% {
+        box-shadow: 0 0 20px rgba(0, 247, 255, 0.8), 0 0 40px rgba(0, 247, 255, 0.6);
+      }
+    }
+
+    /* Scanline effect (::after) */
+    .innovation-image::after {
       content: '';
       position: absolute;
-      inset: 0; /* Covers the entire element, including padding */
-      border-radius: 20px; /* Matches parent's border-radius */
-      /* This gradient will be animated to create the moving line effect */
-      background: linear-gradient(45deg, #00f7ff 0%, #000000 50%, #00f7ff 100%);
-      background-size: 400% 400%; /* Larger size for the animation to move across */
-      animation: border-line-animation 4s linear infinite; /* New animation for the line */
-      z-index: 1; /* Ensures the line is above the image's background */
-      pointer-events: none; /* Allows clicks to pass through to the image */
+      top: 0;
+      left: -50%; /* Start off-screen to the left */
+      width: 50%; /* Width of the scanline */
+      height: 100%;
+      background: linear-gradient(to right, transparent, rgba(0, 247, 255, 0.6), transparent);
+      transform: skewX(-20deg); /* Angle the scanline */
+      animation: scanline-sweep 3s infinite linear; /* Animation for the sweep */
+      z-index: 3; /* Ensure it's above the image */
+      pointer-events: none; /* Allow clicks to pass through */
+    }
 
-      /* Masking to create the "line inside border" effect */
-      /* This creates a transparent center and opaque border area */
-      mask:
-        linear-gradient(#fff 0 0) content-box, /* Outer shape (full element) */
-        linear-gradient(#fff 0 0) 
-        padding-box; /* Inner shape (padding area) */
-      mask-composite: exclude; /* Exclude inner from outer */
-      -webkit-mask-composite: exclude; /* For WebKit browsers */
+    /* Keyframes for the scanline sweep */
+    @keyframes scanline-sweep {
+      0% {
+        left: -50%;
+      }
+      100% {
+        left: 100%;
+      }
     }
 
     /* The actual image content, placed above the animated line */
@@ -222,17 +237,7 @@
       object-fit: cover;
       position: relative; /* Essential for z-index to work */
       z-index: 2; /* Ensures the image is above the animated line */
-      padding: 10px; /* Creates space for the animated line to be visible */
-    }
-
-    /* Keyframes for the moving line animation */
-    @keyframes border-line-animation {
-      0% {
-        background-position: 0% 0%;
-      }
-      100% {
-        background-position: 100% 100%;
-      }
+      /* Removed padding here, as the glow and scanline are now outside the image content */
     }
 
     .innovation-image.is-visible {
@@ -346,12 +351,25 @@
       flex-grow: 1; /* Allows the iframe container to take up available vertical space */
       overflow: hidden; /* Hides any overflow from the iframe */
       display: flex; /* Ensures the iframe fills its container */
+      position: relative; /* Needed for loading text positioning */
     }
     .chatbot-iframe-container iframe {
       width: 100%;
       height: 100%;
       border: none; /* Removes default iframe border */
       border-radius: 0 0 8px 8px; /* Matches the bottom border-radius of the modal content */
+    }
+    /* Loading text for chatbot */
+    #chatbot-loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #00f7ff;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1rem;
+      z-index: 1; /* Ensure it's above the iframe while loading */
     }
 
 
@@ -456,12 +474,11 @@
       .innovation-image {
         width: 150px; /* Smaller width for mobile */
         height: 100px; /* Smaller height for mobile */
-        /* padding: 5px; /* Smaller padding */ /* Removed, padding is now on the img */
         min-width: unset; /* Remove min-width for mobile */
       }
       /* Adjust image padding for mobile */
       .innovation-image img {
-        padding: 5px; 
+        /* No padding needed here anymore */
       }
       .matrix-text {
         font-size: 1rem;
@@ -640,7 +657,8 @@
               <span id="close-chatbot" class="close-chatbot">&times;</span>
           </div>
           <div class="chatbot-iframe-container">
-              <iframe src="https://www.chatbase.co/chatbot-iframe/7nAceRz4VtIakEojiLmW3" title="Chatbot"></iframe>
+              <div id="chatbot-loading" style="color: #00f7ff; text-align: center; padding: 20px;">Loading AI Assistant...</div>
+              <iframe src="https://www.chatbase.co/chatbot-iframe/7nAceRz4VtIakEojiLmW3" title="Chatbot" onload="document.getElementById('chatbot-loading').style.display='none';"></iframe>
           </div>
       </div>
   </div>
