@@ -178,47 +178,60 @@
       width: 250px; /* Set a fixed width for desktop */
       height: 180px; /* Set a fixed height for desktop */
       border-radius: 20px;
-      box-shadow: inset 0 0 5px rgba(0, 247, 255, 0.3); /* Subtle inner shadow */
-      transition: transform 0.5s ease, opacity 0.8s ease; /* Added opacity to transition */
-      object-fit: cover; /* Use cover to fill the space, cropping if necessary */
-      padding: 10px; /* Add some padding inside the border */
       background-color: rgba(0, 0, 0, 0.5); /* Background for transparent GIFs */
       cursor: pointer; /* Indicate it's clickable */
       position: relative; /* Needed for pseudo-element positioning */
       overflow: hidden; /* Crucial to clip the pseudo-element */
       flex-shrink: 0; /* Prevent images from shrinking */
-
+      /* No direct border here, the animated line will act as the border */
+      
       /* Initial state for slide-in effect */
       opacity: 0;
       transform: translateX(100px); /* Start off-screen to the right */
+      transition: transform 0.5s ease, opacity 0.8s ease; /* Added opacity to transition */
     }
 
+    /* Animated line border for innovation images (::before) */
     .innovation-image::before {
       content: '';
       position: absolute;
-      top: -5px; /* Adjust to control border thickness and glow spread */
-      left: -5px;
-      right: -5px;
-      bottom: -5px;
-      z-index: -1; /* Place behind the image */
-      border-radius: 25px; /* Slightly larger than image border-radius for the glow */
-      background: linear-gradient(45deg, #000000, #00f7ff, #000000); /* Gradient for the light */
-      background-size: 300% 300%; /* Make gradient larger for movement */
-      animation: border-light-move 4s linear infinite; /* Animation definition */
-      filter: blur(8px); /* Blur for the glowing effect */
-      opacity: 0.7; /* Make the glow slightly transparent */
+      inset: 0; /* Covers the entire element, including padding */
+      border-radius: 20px; /* Matches parent's border-radius */
+      /* This gradient will be animated to create the moving line effect */
+      background: linear-gradient(45deg, #00f7ff 0%, #000000 50%, #00f7ff 100%);
+      background-size: 400% 400%; /* Larger size for the animation to move across */
+      animation: border-line-animation 4s linear infinite; /* New animation for the line */
+      z-index: 1; /* Ensures the line is above the image's background */
+      pointer-events: none; /* Allows clicks to pass through to the image */
+
+      /* Masking to create the "line inside border" effect */
+      /* This creates a transparent center and opaque border area */
+      mask:
+        linear-gradient(#fff 0 0) content-box, /* Outer shape (full element) */
+        linear-gradient(#fff 0 0) 
+        padding-box; /* Inner shape (padding area) */
+      mask-composite: exclude; /* Exclude inner from outer */
+      -webkit-mask-composite: exclude; /* For WebKit browsers */
     }
 
-    /* Keyframes for the moving light animation */
-    @keyframes border-light-move {
+    /* The actual image content, placed above the animated line */
+    .innovation-image img {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px; /* Slightly smaller border-radius for the image inside */
+      object-fit: cover;
+      position: relative; /* Essential for z-index to work */
+      z-index: 2; /* Ensures the image is above the animated line */
+      padding: 10px; /* Creates space for the animated line to be visible */
+    }
+
+    /* Keyframes for the moving line animation */
+    @keyframes border-line-animation {
       0% {
         background-position: 0% 0%;
       }
-      50% {
-        background-position: 100% 100%;
-      }
       100% {
-        background-position: 0% 0%;
+        background-position: 100% 100%;
       }
     }
 
@@ -282,7 +295,7 @@
         fill: #000;
     }
     .chatbot-modal {
-        display: none;
+        display: none; /* This is correct, it's shown by JS */
         position: fixed;
         z-index: 1001;
         left: 0;
@@ -307,7 +320,7 @@
         height: 80%;
         max-height: 720px;
         display: flex;
-        flex-direction: column;
+        flex-direction: column; /* Changed to column for proper iframe sizing */
     }
     .chatbot-modal-header {
         padding: 10px 15px;
@@ -327,6 +340,20 @@
         cursor: pointer;
     }
     .close-chatbot:hover { color: #fff; }
+
+    /* Styles for the chatbot iframe container and iframe */
+    .chatbot-iframe-container {
+      flex-grow: 1; /* Allows the iframe container to take up available vertical space */
+      overflow: hidden; /* Hides any overflow from the iframe */
+      display: flex; /* Ensures the iframe fills its container */
+    }
+    .chatbot-iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none; /* Removes default iframe border */
+      border-radius: 0 0 8px 8px; /* Matches the bottom border-radius of the modal content */
+    }
+
 
     /* --- Full Image Modal Styles --- */
     .full-image-modal {
@@ -429,8 +456,12 @@
       .innovation-image {
         width: 150px; /* Smaller width for mobile */
         height: 100px; /* Smaller height for mobile */
-        padding: 5px; /* Smaller padding */
+        /* padding: 5px; /* Smaller padding */ /* Removed, padding is now on the img */
         min-width: unset; /* Remove min-width for mobile */
+      }
+      /* Adjust image padding for mobile */
+      .innovation-image img {
+        padding: 5px; 
       }
       .matrix-text {
         font-size: 1rem;
@@ -557,12 +588,22 @@
       <h2>Our Innovation</h2>
       <div class="innovation-images-container" id="innovation-carousel">
         <!-- Original image -->
-        <img src="idea.png" alt="Innovative Idea" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+GIF'"/>
+        <div class="innovation-image">
+          <img src="idea.png" alt="Innovative Idea" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+GIF'"/>
+        </div>
         <!-- New images -->
-        <img src="idea1.gif" alt="Innovative Idea 1" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+1+GIF'"/>
-        <img src="idea2.png" alt="Innovative Idea 2" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+2+PNG'"/>
-        <img src="idea3.png" alt="Innovative Idea 3" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+3+PNG'"/>
-        <img src="idea4.png" alt="Innovative Idea 4" class="innovation-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+4+PNG'"/>
+        <div class="innovation-image">
+          <img src="idea1.gif" alt="Innovative Idea 1" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+1+GIF'"/>
+        </div>
+        <div class="innovation-image">
+          <img src="idea2.png" alt="Innovative Idea 2" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+2+PNG'"/>
+        </div>
+        <div class="innovation-image">
+          <img src="idea3.png" alt="Innovative Idea 3" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+3+PNG'"/>
+        </div>
+        <div class="innovation-image">
+          <img src="idea4.png" alt="Innovative Idea 4" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+4+PNG'"/>
+        </div>
       </div>
       <div class="matrix-text" id="matrix-effect" data-text="At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges."></div>
     </section>
@@ -770,12 +811,14 @@
     const fullImageModal = document.getElementById("fullImageModal");
     const fullImage = document.getElementById("img01");
     const closeFullImageModal = document.getElementsByClassName("close-full-image-modal")[0];
-    const innovationImagesElements = document.querySelectorAll('.innovation-image'); // Renamed to avoid conflict
+    // Select the .innovation-image divs, not the img tags directly for click listener
+    const innovationImageContainers = document.querySelectorAll('.innovation-image'); 
 
-    innovationImagesElements.forEach(image => {
-        image.addEventListener('click', function() {
+    innovationImageContainers.forEach(container => {
+        container.addEventListener('click', function() {
             fullImageModal.style.display = "flex"; // Use flex to center content
-            fullImage.src = this.src; // Set the source to the clicked image's source
+            // Get the src from the img element INSIDE this container
+            fullImage.src = this.querySelector('img').src; 
             fullImage.classList.add('zoomed'); // Add zoom effect
             // Remove zoom class after animation to prepare for next open
             setTimeout(() => fullImage.classList.remove('zoomed'), 300); 
