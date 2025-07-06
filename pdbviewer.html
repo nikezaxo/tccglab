@@ -32,104 +32,144 @@
         body {
             font-family: 'Inter', monospace, sans-serif; /* Monospace for digital feel */
             background-color: var(--matrix-black);
-            background-image: radial-gradient(circle at top left, rgba(0, 255, 0, 0.05) 0%, transparent 50%),
-                              radial-gradient(circle at bottom right, rgba(0, 255, 0, 0.05) 0%, transparent 50%);
+            background-image: radial-gradient(circle at top left, rgba(97, 177, 230, 0.664) 0%, transparent 50%),
+                                radial-gradient(circle at bottom right, rgba(106, 207, 233, 0.774) 0%, transparent 50%);
             margin: 0;
-            padding: 2rem 0;
+            padding: 1rem 0; /* Reduced padding */
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-height: auto; /* Changed to auto for embedding */
             color: var(--matrix-green); /* Default text color */
             overflow-y: auto; /* Ensure scrolling is enabled */
+            /* Custom Scrollbar for Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: var(--matrix-green) var(--matrix-dark-grey);
         }
+
+        /* Custom Scrollbar for Webkit browsers (Chrome, Safari) */
+        body::-webkit-scrollbar {
+            width: 8px; /* Width of the scrollbar */
+        }
+
+        body::-webkit-scrollbar-track {
+            background: var(--matrix-dark-grey); /* Color of the scrollbar track */
+            border-radius: 10px;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: var(--matrix-green); /* Color of the scrollbar thumb */
+            border-radius: 10px; /* Rounded corners for the thumb */
+            border: 2px solid var(--matrix-dark-grey); /* Border around the thumb */
+        }
+
+        /* Styling for scrollable info-box list */
+        .info-box ul::-webkit-scrollbar {
+            width: 6px;
+        }
+        .info-box ul::-webkit-scrollbar-track {
+            background: rgba(0, 20, 0, 0.3);
+            border-radius: 8px;
+        }
+        .info-box ul::-webkit-scrollbar-thumb {
+            background-color: rgba(140, 204, 212, 0.5);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+        }
+        .info-box ul {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 255, 0, 0.5) rgba(0, 20, 0, 0.3);
+        }
+
+
         .container {
             background-color: rgba(0, 50, 0, 0.15); /* Dark green transparent */
             backdrop-filter: blur(5px); /* Frosted glass effect */
-            padding: 2.5rem;
-            border-radius: 1.25rem; /* rounded-2xl */
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4), inset 0 0 10px rgba(0, 255, 0, 0.2); /* Green glow */
+            padding: 1.5rem; /* Reduced padding */
+            border-radius: 1rem; /* Slightly smaller rounded corners */
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4), inset 0 0 8px rgba(0, 255, 0, 0.2); /* Green glow */
             text-align: center;
-            width: 95%;
-            max-width: 900px;
-            margin-bottom: 2rem;
+            width: 98%; /* Increased width to fill more of the iframe */
+            max-width: 800px; /* Reduced max-width */
+            margin-bottom: 1.5rem; /* Reduced margin */
             border: 1px solid rgba(0, 255, 0, 0.3); /* Subtle green border */
         }
         h1 {
-            font-size: 2.8rem; /* Larger title */
+            font-size: 2rem; /* Reduced font size */
             font-weight: 700;
             color: var(--matrix-green);
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Stronger glow */
-            letter-spacing: 0.1em; /* Spaced out for digital feel */
+            margin-bottom: 0.8rem; /* Reduced margin */
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.8); /* Stronger glow */
+            letter-spacing: 0.08em; /* Spaced out for digital feel */
         }
         p {
-            font-size: 1.125rem;
+            font-size: 0.95rem; /* Reduced font size */
             color: var(--matrix-light-grey); /* Slightly lighter for readability */
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem; /* Reduced margin */
         }
         .input-group {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
+            gap: 0.75rem; /* Reduced gap */
+            margin-top: 1rem; /* Reduced margin */
         }
         input[type="text"] {
-            padding: 0.85rem 1.25rem;
+            padding: 0.6rem 1rem; /* Reduced padding */
             border: 1px solid var(--matrix-green);
-            border-radius: 0.75rem;
+            border-radius: 0.6rem; /* Reduced border-radius */
             background-color: rgba(0, 20, 0, 0.8); /* Very dark green background */
             color: var(--matrix-green);
-            font-size: 1rem;
+            font-size: 0.9rem; /* Reduced font size */
             flex-grow: 1;
-            max-width: 300px;
+            max-width: 250px; /* Reduced max-width */
             transition: all 0.3s ease;
-            box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.3);
+            box-shadow: inset 0 0 4px rgba(0, 255, 0, 0.3);
         }
         input[type="text"]:focus {
             outline: none;
             border-color: var(--matrix-green);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8), inset 0 0 8px rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.8), inset 0 0 6px rgba(0, 255, 0, 0.5);
         }
         button {
-            padding: 0.85rem 1.75rem;
-            border-radius: 0.75rem;
+            padding: 0.6rem 1.25rem; /* Reduced padding */
+            border-radius: 0.6rem; /* Reduced border-radius */
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.08em; /* More spacing */
+            letter-spacing: 0.07em; /* More spacing */
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); /* Initial glow */
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.5); /* Initial glow */
             background-color: rgba(0, 100, 0, 0.5); /* Dark green button background */
             color: var(--matrix-green);
             border: 1px solid var(--matrix-green);
         }
         button:hover {
             background-color: rgba(0, 150, 0, 0.7); /* Brighter green on hover */
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.9); /* Stronger glow on hover */
-            transform: translateY(-3px); /* More pronounced lift */
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.9); /* Stronger glow on hover */
+            transform: translateY(-2px); /* More pronounced lift */
         }
 
         .render-options, .color-options, .info-box {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-            padding: 1rem;
+            gap: 1rem; /* Reduced gap */
+            margin-top: 1rem; /* Reduced margin */
+            padding: 0.8rem; /* Reduced padding */
             background-color: rgba(0, 50, 0, 0.1); /* Lighter transparent green */
-            border-radius: 0.75rem;
+            border-radius: 0.6rem; /* Reduced border-radius */
             border: 1px solid rgba(0, 255, 0, 0.2);
             color: var(--matrix-light-grey);
-            font-size: 0.95rem;
+            font-size: 0.85rem; /* Reduced font size */
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Added transition for smooth show/hide */
         }
 
         .render-option-item, .color-option-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem; /* Reduced gap */
             cursor: pointer;
             color: var(--matrix-light-grey);
             font-weight: 500;
@@ -139,111 +179,60 @@
             color: var(--matrix-green);
         }
         .render-option-item input[type="radio"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid var(--matrix-green); /* Green border */
-            border-radius: 50%;
-            background-color: transparent;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3); /* Subtle glow */
+            width: 1rem; /* Reduced size */
+            height: 1rem; /* Reduced size */
+            border: 1.5px solid var(--matrix-green); /* Reduced border */
+            box-shadow: 0 0 4px rgba(0, 255, 0, 0.3); /* Subtle glow */
         }
         .render-option-item input[type="radio"]:checked {
-            background-color: var(--matrix-green);
-            border-color: var(--matrix-green);
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.6); /* Stronger glow when checked */
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.6); /* Stronger glow when checked */
         }
         .render-option-item input[type="radio"]:checked::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 0.5rem;
-            height: 0.5rem;
-            border-radius: 50%;
-            background-color: var(--matrix-black); /* Black dot inside green */
+            width: 0.4rem; /* Reduced size */
+            height: 0.4rem; /* Reduced size */
         }
 
         /* Styling for color input */
         .color-option-item input[type="color"] {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            width: 2.5rem; /* Larger size */
-            height: 1.5rem;
-            background: none;
-            border: 2px solid var(--matrix-green);
-            border-radius: 0.3rem; /* Slightly rounded corners */
-            cursor: pointer;
-            padding: 0;
-            overflow: hidden; /* Hide default color picker border */
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
-            transition: box-shadow 0.2s ease;
-        }
-        .color-option-item input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-        .color-option-item input[type="color"]::-webkit-color-swatch {
-            border: none;
-            border-radius: 0.2rem;
-        }
-        .color-option-item input[type="color"]::-moz-color-swatch-wrapper {
-            padding: 0;
-        }
-        .color-option-item input[type="color"]::-moz-color-swatch {
-            border: none;
-            border-radius: 0.2rem;
+            width: 2rem; /* Reduced size */
+            height: 1.2rem; /* Reduced size */
+            border: 1.5px solid var(--matrix-green);
+            border-radius: 0.25rem; /* Slightly rounded corners */
+            box-shadow: 0 0 4px rgba(0, 255, 0, 0.3);
         }
         .color-option-item input[type="color"]:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
         }
 
         .info-box {
-            text-align: left;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            color: var(--matrix-light-grey);
+            padding: 1rem; /* Reduced padding */
+            margin-top: 1rem; /* Reduced margin */
+            font-size: 0.9rem; /* Reduced font size */
         }
         .info-box h2 {
-            font-size: 1.3rem;
-            color: var(--matrix-green);
-            margin-bottom: 0.8rem;
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            font-size: 1.1rem; /* Reduced font size */
+            margin-bottom: 0.6rem; /* Reduced margin */
+            text-shadow: 0 0 4px rgba(0, 255, 0, 0.5);
         }
         .info-box p, .info-box ul {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem; /* Reduced margin */
         }
         .info-box ul {
-            list-style: none; /* Remove default bullet points */
-            padding-left: 0;
-            max-height: 150px; /* Limit height for long lists */
-            overflow-y: auto; /* Allow scrolling for ligand list */
-            border: 1px solid rgba(0, 255, 0, 0.1);
-            border-radius: 0.5rem;
-            padding: 0.5rem 1rem;
-            background-color: rgba(0, 20, 0, 0.5);
+            max-height: 120px; /* Reduced max-height */
+            padding: 0.4rem 0.8rem; /* Reduced padding */
         }
         .info-box li {
-            padding: 0.2rem 0;
-            border-bottom: 1px dashed rgba(0, 255, 0, 0.1);
-        }
-        .info-box li:last-child {
-            border-bottom: none;
+            padding: 0.15rem 0; /* Reduced padding */
         }
 
 
         #messageBox {
-            margin-top: 1.5rem;
-            padding: 0.75rem 1.25rem;
-            border-radius: 0.5rem;
+            margin-top: 1rem; /* Reduced margin */
+            padding: 0.6rem 1rem; /* Reduced padding */
+            border-radius: 0.4rem; /* Reduced border-radius */
             font-weight: 500;
-            font-size: 0.95rem;
-            animation: fadeIn 0.5s ease-out;
+            font-size: 0.85rem; /* Reduced font size */
+            animation: matrixFadeIn 0.6s ease-out; /* Apply new animation */
             border: 1px solid; /* Add border for consistency */
         }
         #messageBox.text-red-600 {
@@ -258,82 +247,81 @@
         }
 
         /* Canvas styling */
-        #pdb3dCanvas { /* Reverted to original ID for 3D canvas */
+        #pdb3dCanvas {
             display: block;
-            background-color: var(--matrix-dark-grey); /* Very dark background for the 3D scene */
-            border-radius: 1.25rem;
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.6), inset 0 0 10px rgba(0, 255, 0, 0.3); /* Strong green glow */
-            margin-top: 2rem;
+            background-color: var(--matrix-dark-grey);
+            border-radius: 1rem; /* Reduced border-radius */
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6), inset 0 0 8px rgba(0, 255, 0, 0.3); /* Stronger green glow */
+            margin-top: 1.5rem; /* Reduced margin */
             border: 1px solid rgba(0, 255, 0, 0.3);
-            width: 95vw;
-            max-width: 900px;
-            height: 70vh;
-            max-height: 700px;
+            width: 100%; /* Make it fill the iframe width */
+            height: 400px; /* Set a fixed height for better control in embedding */
+            max-width: none; /* Removed max-width */
+            max-height: none; /* Removed max-height */
         }
 
         .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95); /* Almost opaque black */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: var(--matrix-green);
-            font-size: 1.8rem;
-            z-index: 1000;
-            text-shadow: 1px 1px 5px rgba(0, 255, 0, 0.7);
+            font-size: 1.4rem; /* Reduced font size */
+            animation: matrixFadeIn 0.8s ease-out forwards; /* Apply new animation */
         }
         .spinner {
-            border: 8px solid rgba(0, 255, 0, 0.2); /* Transparent green */
-            border-top: 8px solid var(--matrix-green); /* Solid green */
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            animation: spin 1.2s linear infinite; /* Faster spin */
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Glow on spinner */
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            border: 6px solid rgba(0, 255, 0, 0.2); /* Reduced border */
+            border-top: 6px solid var(--matrix-green); /* Reduced border */
+            width: 60px; /* Reduced size */
+            height: 60px; /* Reduced size */
+            margin-bottom: 1rem; /* Reduced margin */
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.7); /* Glow on spinner */
         }
 
-        /* Responsive adjustments */
+        /* New Matrix-style fade-in animation */
+        @keyframes matrixFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9) skewX(-5deg);
+                filter: blur(5px);
+            }
+            50% {
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) skewX(0deg);
+                filter: blur(0);
+            }
+        }
+
+        /* Class for info-box when visible */
+        .info-box.is-visible {
+            animation: matrixFadeIn 0.6s ease-out forwards;
+        }
+
+        /* Responsive adjustments for smaller screens (inside the iframe) */
         @media (max-width: 768px) {
             .container {
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
+                padding: 1rem;
+                margin-bottom: 1rem;
             }
             h1 {
-                font-size: 2rem;
+                font-size: 1.6rem;
             }
             p {
-                font-size: 1rem;
+                font-size: 0.85rem;
             }
             .input-group {
-                flex-direction: column;
-                gap: 0.75rem;
+                gap: 0.5rem;
             }
             input[type="text"], button {
-                width: 100%;
-                max-width: none;
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
             }
-            .render-options, .color-options {
-                flex-direction: column;
-                gap: 0.75rem;
+            .render-options, .color-options, .info-box {
+                gap: 0.5rem;
+                padding: 0.6rem;
+                font-size: 0.8rem;
             }
             #pdb3dCanvas {
-                margin-top: 1.5rem;
-                width: 98vw;
-                height: 50vh;
+                margin-top: 1rem;
+                height: 300px; /* Further reduced height for very small screens */
             }
         }
     </style>
@@ -352,6 +340,7 @@
             <label class="render-option-item">
                 <input type="radio" name="renderMode" value="line" checked>
                 Line // ViewDefault
+            </label>
             <label class="render-option-item">
                 <input type="radio" name="renderMode" value="ballAndStick">
                 Ball-and-Stick // Skeletal View
@@ -366,8 +355,6 @@
             </label>
 
         </div>
-
-        <!-- Removed color options as requested -->
 
         <div id="messageBox" class="mt-4 hidden"></div>
 
@@ -393,6 +380,11 @@
         let initialCameraPosition = new THREE.Vector3(0, 0, 50); // Default camera position
         let initialControlsTarget = new THREE.Vector3(0, 0, 0); // Default camera target
         let loadedAtoms = []; // Store parsed atoms for re-rendering
+        let currentMoleculeGroup; // Group to hold all molecule meshes
+
+        // --- Global Scaling Factor for 3D Models ---
+        // This factor will make the atoms and bonds appear smaller relative to the canvas size.
+        const MODEL_SCALE_FACTOR = 0.7; // Adjusted to make models smaller
 
         // --- DOM Elements ---
         const pdbIdInput = document.getElementById('pdbIdInput');
@@ -402,43 +394,42 @@
         const messageBox = document.getElementById('messageBox');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const renderModeRadios = document.querySelectorAll('input[name="renderMode"]');
-        // Removed proteinColorModeRadios, proteinColorInput, ligandColorInput
         const pdbInfoBox = document.getElementById('pdbInfoBox');
         const atomCountInfo = document.getElementById('atomCountInfo');
         const ligandCountInfo = document.getElementById('ligandCountInfo');
         const ligandList = document.getElementById('ligandList');
 
-        // --- Molecular Data Constants ---
+        // --- Molecular Data Constants (Scaled by MODEL_SCALE_FACTOR) ---
         // Atom radii for Ball-and-Stick model (scaled for visual clarity)
         const ATOM_RADII_BALL_AND_STICK = {
-            'H': 0.25, 'C': 0.70, 'N': 0.65, 'O': 0.60, 'S': 1.00, 'P': 0.95,
-            'F': 0.60, 'Cl': 1.00, 'Br': 1.15, 'I': 1.40, 'He': 0.50, 'Ne': 0.70,
-            'Ar': 0.90, 'Kr': 1.00, 'Xe': 1.10, 'Li': 1.45, 'Na': 1.80, 'K': 2.20,
-            'Rb': 2.35, 'Cs': 2.60, 'Mg': 1.50, 'Ca': 1.80, 'Fe': 1.25, 'Zn': 1.35,
-            'UNKNOWN': 0.7
+            'H': 0.25 * MODEL_SCALE_FACTOR, 'C': 0.70 * MODEL_SCALE_FACTOR, 'N': 0.65 * MODEL_SCALE_FACTOR, 'O': 0.60 * MODEL_SCALE_FACTOR, 'S': 1.00 * MODEL_SCALE_FACTOR, 'P': 0.95 * MODEL_SCALE_FACTOR,
+            'F': 0.60 * MODEL_SCALE_FACTOR, 'Cl': 1.00 * MODEL_SCALE_FACTOR, 'Br': 1.15 * MODEL_SCALE_FACTOR, 'I': 1.40 * MODEL_SCALE_FACTOR, 'He': 0.50 * MODEL_SCALE_FACTOR, 'Ne': 0.70 * MODEL_SCALE_FACTOR,
+            'Ar': 0.90 * MODEL_SCALE_FACTOR, 'Kr': 1.00 * MODEL_SCALE_FACTOR, 'Xe': 1.10 * MODEL_SCALE_FACTOR, 'Li': 1.45 * MODEL_SCALE_FACTOR, 'Na': 1.80 * MODEL_SCALE_FACTOR, 'K': 2.20 * MODEL_SCALE_FACTOR,
+            'Rb': 2.35 * MODEL_SCALE_FACTOR, 'Cs': 2.60 * MODEL_SCALE_FACTOR, 'Mg': 1.50 * MODEL_SCALE_FACTOR, 'Ca': 1.80 * MODEL_SCALE_FACTOR, 'Fe': 1.25 * MODEL_SCALE_FACTOR, 'Zn': 1.35 * MODEL_SCALE_FACTOR,
+            'UNKNOWN': 0.7 * MODEL_SCALE_FACTOR
         };
 
         // Atom radii for Space-Filling (CPK) model (van der Waals radii in Angstroms)
         const ATOM_RADII_SPACE_FILLING = {
-            'H': 1.20, 'C': 1.70, 'N': 1.55, 'O': 1.52, 'S': 1.80, 'P': 1.80,
-            'F': 1.47, 'Cl': 1.75, 'Br': 1.85, 'I': 1.98, 'He': 1.40, 'Ne': 1.54,
-            'Ar': 1.88, 'Kr': 2.02, 'Xe': 2.16, 'Li': 1.82, 'Na': 2.27, 'K': 2.75,
-            'Rb': 2.95, 'Cs': 3.43, 'Mg': 1.73, 'Ca': 2.31, 'Fe': 1.25, 'Zn': 1.39,
-            'UNKNOWN': 1.7
+            'H': 1.20 * MODEL_SCALE_FACTOR, 'C': 1.70 * MODEL_SCALE_FACTOR, 'N': 1.55 * MODEL_SCALE_FACTOR, 'O': 1.52 * MODEL_SCALE_FACTOR, 'S': 1.80 * MODEL_SCALE_FACTOR, 'P': 1.80 * MODEL_SCALE_FACTOR,
+            'F': 1.47 * MODEL_SCALE_FACTOR, 'Cl': 1.75 * MODEL_SCALE_FACTOR, 'Br': 1.85 * MODEL_SCALE_FACTOR, 'I': 1.98 * MODEL_SCALE_FACTOR, 'He': 1.40 * MODEL_SCALE_FACTOR, 'Ne': 1.54 * MODEL_SCALE_FACTOR,
+            'Ar': 1.88 * MODEL_SCALE_FACTOR, 'Kr': 2.02 * MODEL_SCALE_FACTOR, 'Xe': 2.16 * MODEL_SCALE_FACTOR, 'Li': 1.82 * MODEL_SCALE_FACTOR, 'Na': 2.27 * MODEL_SCALE_FACTOR, 'K': 2.75 * MODEL_SCALE_FACTOR,
+            'Rb': 2.95 * MODEL_SCALE_FACTOR, 'Cs': 3.43 * MODEL_SCALE_FACTOR, 'Mg': 1.73 * MODEL_SCALE_FACTOR, 'Ca': 2.31 * MODEL_SCALE_FACTOR, 'Fe': 1.25 * MODEL_SCALE_FACTOR, 'Zn': 1.39 * MODEL_SCALE_FACTOR,
+            'UNKNOWN': 1.7 * MODEL_SCALE_FACTOR
         };
 
         // Atom radii for Line model (very small spheres)
         const ATOM_RADII_LINE = {
-            'H': 0.1, 'C': 0.1, 'N': 0.1, 'O': 0.1, 'S': 0.1, 'P': 0.1,
-            'F': 0.1, 'Cl': 0.1, 'Br': 0.1, 'I': 0.1, 'He': 0.1, 'Ne': 0.1,
-            'Ar': 0.1, 'Kr': 0.1, 'Xe': 0.1, 'Li': 0.1, 'Na': 0.1, 'K': 0.1,
-            'Rb': 0.1, 'Cs': 0.1, 'Mg': 0.1, 'Ca': 0.1, 'Fe': 0.1, 'Zn': 0.1,
-            'UNKNOWN': 0.1
+            'H': 0.1 * MODEL_SCALE_FACTOR, 'C': 0.1 * MODEL_SCALE_FACTOR, 'N': 0.1 * MODEL_SCALE_FACTOR, 'O': 0.1 * MODEL_SCALE_FACTOR, 'S': 0.1 * MODEL_SCALE_FACTOR, 'P': 0.1 * MODEL_SCALE_FACTOR,
+            'F': 0.1 * MODEL_SCALE_FACTOR, 'Cl': 0.1 * MODEL_SCALE_FACTOR, 'Br': 0.1 * MODEL_SCALE_FACTOR, 'I': 0.1 * MODEL_SCALE_FACTOR, 'He': 0.1 * MODEL_SCALE_FACTOR, 'Ne': 0.1 * MODEL_SCALE_FACTOR,
+            'Ar': 0.1 * MODEL_SCALE_FACTOR, 'Kr': 0.1 * MODEL_SCALE_FACTOR, 'Xe': 0.1 * MODEL_SCALE_FACTOR, 'Li': 0.1 * MODEL_SCALE_FACTOR, 'Na': 0.1 * MODEL_SCALE_FACTOR, 'K': 0.1 * MODEL_SCALE_FACTOR,
+            'Rb': 0.1 * MODEL_SCALE_FACTOR, 'Cs': 0.1 * MODEL_SCALE_FACTOR, 'Mg': 0.1 * MODEL_SCALE_FACTOR, 'Ca': 0.1 * MODEL_SCALE_FACTOR, 'Fe': 0.1 * MODEL_SCALE_FACTOR, 'Zn': 0.1 * MODEL_SCALE_FACTOR,
+            'UNKNOWN': 0.1 * MODEL_SCALE_FACTOR
         };
 
         const MATRIX_GREEN_COLOR = 0x00FF00; // Bright green for wireframe/line
-        const BOND_RADIUS = 0.15; // Radius for bond cylinders in Ball-and-Stick
-        const BOND_THRESHOLD = 1.8; // Max distance for a covalent bond (Angstroms)
+        const BOND_RADIUS = 0.15 * MODEL_SCALE_FACTOR; // Radius for bond cylinders in Ball-and-Stick
+        const BOND_THRESHOLD = 1.8; // Max distance for a covalent bond (Angstroms) - this is a distance, not a size, so not scaled
 
         // PyMOL-like CPK Colors (hexadecimal values) - more vibrant
         const PYMOL_CPK_COLORS = {
@@ -600,7 +591,7 @@
                         throw new Error(`PDB ID "${pdbId}" not found. Please verify the ID.`);
                     }
                     throw new Error(`Network error: ${response.statusText}`);
-                }
+                    }
                 const text = await response.text();
                 if (text.includes("Invalid PDB ID") || text.includes("File not found")) {
                     throw new Error(`PDB ID "${pdbId}" is invalid or does not exist on RCSB PDB.`);
@@ -665,7 +656,14 @@
                 scene.remove(currentMoleculeGroup);
                 currentMoleculeGroup.children.forEach(child => {
                     if (child.geometry) child.geometry.dispose();
-                    if (child.material) child.material.dispose();
+                    if (child.material) {
+                        // Dispose of materials, especially if they are not shared
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(m => m.dispose());
+                        } else {
+                            child.material.dispose();
+                        }
+                    }
                 });
                 currentMoleculeGroup = null;
             }
@@ -680,9 +678,8 @@
             let renderBondsAsLines = false;
 
             // Colors are now fixed as per request
-            const proteinColor = new THREE.Color(); // Will be set per atom based on CPK
             const ligandColor = LIGAND_COLOR; // Fixed red for ligands
-
+            const bondColor = new THREE.Color(0x333333); // Dark grey for bonds in ball-and-stick
 
             switch (mode) {
                 case 'ballAndStick':
@@ -693,9 +690,9 @@
                     currentAtomRadii = ATOM_RADII_SPACE_FILLING;
                     break;
                 case 'wireframe':
-                    currentAtomRadii = ATOM_RADII_BALL_AND_STICK;
+                    currentAtomRadii = ATOM_RADII_BALL_AND_STICK; // Atoms still have size for wireframe
                     wireframeEnabled = true;
-                    renderBondsAsCylinders = true;
+                    renderBondsAsCylinders = true; // Bonds also rendered as wireframe cylinders
                     break;
                 case 'line':
                     currentAtomRadii = ATOM_RADII_LINE;
@@ -748,35 +745,42 @@
                     instancedAtoms.setMatrixAt(i, dummy.matrix);
 
                     if (mode !== 'wireframe') {
-                        instancedAtoms.instanceColor.setXYZ(i, atomColor.r, atomColor.g, atomColor.b);
+                        atomColor.toArray(instancedAtoms.instanceColor.array, i * 3);
                     }
                 });
-
                 instancedAtoms.instanceMatrix.needsUpdate = true;
                 if (mode !== 'wireframe') {
                     instancedAtoms.instanceColor.needsUpdate = true;
                 }
                 currentMoleculeGroup.add(instancedAtoms);
-                console.log(`Added InstancedMesh with ${atoms.length} instances.`);
-
+                console.log(`Added ${atoms.length} instanced atoms.`);
             } else if (mode === 'line') {
-                for (const atom of atoms) {
-                    const radius = ATOM_RADII_LINE[atom.element] || ATOM_RADII_LINE['UNKNOWN'];
-                    const geometry = new THREE.SphereGeometry(radius, 8, 8);
-                    const material = new THREE.MeshBasicMaterial({ color: MATRIX_GREEN_COLOR });
-                    const sphere = new THREE.Mesh(geometry, material);
+                // For 'line' mode, we'll draw atoms as very small spheres if needed, or just rely on lines
+                // We'll use a single material for all atoms in line mode for simplicity and performance
+                const lineAtomMaterial = new THREE.MeshBasicMaterial({ color: MATRIX_GREEN_COLOR });
+                const lineAtomGeometry = new THREE.SphereGeometry(ATOM_RADII_LINE['UNKNOWN'], 8, 8); // Small spheres
+
+                atoms.forEach(atom => {
+                    const sphere = new THREE.Mesh(lineAtomGeometry, lineAtomMaterial);
                     sphere.position.set(atom.x, atom.y, atom.z);
                     currentMoleculeGroup.add(sphere);
-                }
-                console.log(`Added individual spheres for line mode (${atoms.length} atoms).`);
+                });
+                console.log(`Added ${atoms.length} small spheres for line mode.`);
             }
 
             // --- Render Bonds ---
-            if (renderBondsAsCylinders) {
-                let bondCount = 0;
+            if (renderBondsAsCylinders || renderBondsAsLines) {
+                const bondMaterial = wireframeEnabled
+                    ? new THREE.MeshBasicMaterial({ color: MATRIX_GREEN_COLOR, wireframe: true })
+                    : new THREE.MeshPhongMaterial({ color: bondColor, shininess: 30, specular: 0x050505 });
+
+                const lineBondMaterial = new THREE.LineBasicMaterial({ color: MATRIX_GREEN_COLOR });
+                const bondVertices = [];
+
+                // Iterate through atoms to find bonds
                 for (let i = 0; i < atoms.length; i++) {
+                    const atom1 = atoms[i];
                     for (let j = i + 1; j < atoms.length; j++) {
-                        const atom1 = atoms[i];
                         const atom2 = atoms[j];
 
                         const dist = Math.sqrt(
@@ -785,224 +789,156 @@
                             Math.pow(atom1.z - atom2.z, 2)
                         );
 
+                        // Simple distance-based bonding for visualization
                         if (dist < BOND_THRESHOLD) {
-                            const startPoint = new THREE.Vector3(atom1.x, atom1.y, atom1.z);
-                            const endPoint = new THREE.Vector3(atom2.x, atom2.y, atom2.z);
+                            if (renderBondsAsCylinders) {
+                                const cylinderGeometry = new THREE.CylinderGeometry(BOND_RADIUS, BOND_RADIUS, dist, 8);
+                                const cylinder = new THREE.Mesh(cylinderGeometry, bondMaterial);
 
-                            const midPoint = new THREE.Vector3().addVectors(startPoint, endPoint).multiplyScalar(0.5);
+                                // Position cylinder between atoms
+                                cylinder.position.set(
+                                    (atom1.x + atom2.x) / 2,
+                                    (atom1.y + atom2.y) / 2,
+                                    (atom1.z + atom2.z) / 2
+                                );
 
-                            const cylinderGeometry = new THREE.CylinderGeometry(BOND_RADIUS, BOND_RADIUS, dist, 8);
-                            let cylinderMaterial;
-                            if (wireframeEnabled) {
-                                cylinderMaterial = new THREE.MeshBasicMaterial({ color: MATRIX_GREEN_COLOR, wireframe: true });
-                            } else {
-                                cylinderMaterial = new THREE.MeshPhongMaterial({ color: 0xCCCCCC, shininess: 20, emissive: 0x000500 });
+                                // Orient cylinder to point from atom1 to atom2
+                                const direction = new THREE.Vector3(atom2.x - atom1.x, atom2.y - atom1.y, atom2.z - atom1.z);
+                                const axis = new THREE.Vector3(0, 1, 0); // Y-axis is default for cylinder
+                                cylinder.quaternion.setFromUnitVectors(axis, direction.normalize());
+
+                                currentMoleculeGroup.add(cylinder);
+                            } else if (renderBondsAsLines) {
+                                bondVertices.push(atom1.x, atom1.y, atom1.z);
+                                bondVertices.push(atom2.x, atom2.y, atom2.z);
                             }
-                            const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-
-                            cylinder.position.copy(midPoint);
-                            cylinder.lookAt(endPoint);
-                            cylinder.rotateX(Math.PI / 2);
-
-                            currentMoleculeGroup.add(cylinder);
-                            bondCount++;
                         }
                     }
                 }
-                console.log(`Added ${bondCount} bonds (cylinders).`);
-            } else if (renderBondsAsLines) {
-                const points = [];
-                let lineBondCount = 0;
-                for (let i = 0; i < atoms.length; i++) {
-                    for (let j = i + 1; j < atoms.length; j++) {
-                        const atom1 = atoms[i];
-                        const atom2 = atoms[j];
 
-                        const dist = Math.sqrt(
-                            Math.pow(atom1.x - atom2.x, 2) +
-                            Math.pow(atom1.y - atom2.y, 2) +
-                            Math.pow(atom1.z - atom2.z, 2)
-                        );
-
-                        if (dist < BOND_THRESHOLD) {
-                            points.push(new THREE.Vector3(atom1.x, atom1.y, atom1.z));
-                            points.push(new THREE.Vector3(atom2.x, atom2.y, atom2.z));
-                            lineBondCount++;
-                        }
-                    }
-                }
-                if (points.length > 0) {
-                    const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-                    const lineMaterial = new THREE.LineBasicMaterial({ color: MATRIX_GREEN_COLOR, linewidth: 2 });
-                    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+                if (renderBondsAsLines && bondVertices.length > 0) {
+                    const geometry = new THREE.BufferGeometry();
+                    geometry.setAttribute('position', new THREE.Float32BufferAttribute(bondVertices, 3));
+                    const lines = new THREE.LineSegments(geometry, lineBondMaterial);
                     currentMoleculeGroup.add(lines);
-                    console.log(`Added ${lineBondCount} bonds (lines).`);
+                    console.log(`Added ${bondVertices.length / 6} lines for bonds.`);
                 }
             }
 
-            // --- Adjust Camera and Controls to Fit Molecule ---
+            // --- Center and Fit Camera to Molecule ---
             if (atoms.length > 0) {
                 const boundingBox = new THREE.Box3().setFromObject(currentMoleculeGroup);
                 const center = new THREE.Vector3();
                 boundingBox.getCenter(center);
-
-                currentMoleculeGroup.position.sub(center);
-                console.log('Molecule group recentered by:', center);
-
                 const size = new THREE.Vector3();
                 boundingBox.getSize(size);
+
+                // Center the molecule in the scene
+                currentMoleculeGroup.position.sub(center);
+                console.log('Molecule centered.');
+
+                // Adjust camera to fit the molecule
                 const maxDim = Math.max(size.x, size.y, size.z);
-
-                console.log('Molecule bounding box size (after recentering):', size, 'maxDim:', maxDim);
-
                 const fov = camera.fov * (Math.PI / 180);
                 let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-                cameraZ *= 1.8;
+                cameraZ *= 1.5; // Add some padding
 
-                camera.position.set(0, 0, cameraZ);
-                controls.target.set(0, 0, 0);
+                camera.position.set(center.x, center.y, center.z + cameraZ);
+                controls.target.copy(center);
                 controls.update();
-
-                initialCameraPosition.copy(camera.position);
-                initialControlsTarget.copy(controls.target);
-                console.log('Camera positioned at:', camera.position, 'Controls target:', controls.target);
+                console.log('Camera adjusted to fit molecule.');
             } else {
-                console.log('No atoms to render, resetting camera and controls.');
-                resetCameraAndControls();
+                // If no atoms, reset camera to initial position
+                resetView();
             }
         }
 
         /**
-         * Resets the camera position and controls target to their initial states.
+         * Loads PDB data, parses it, and renders the molecule.
          */
-        function resetCameraAndControls() {
-            camera.position.copy(initialCameraPosition);
-            controls.target.copy(initialControlsTarget);
-            controls.update();
-            console.log('Camera and controls reset to initial positions.');
-        }
-
-        /**
-         * Displays information about the loaded PDB, including atom count and ligands.
-         * @param {Array<Object>} atoms - The parsed atom data.
-         * @param {Array<Array>} ligands - An array of [ligandName, count] pairs.
-         */
-        function displayPdbInfo(atoms, ligands) {
-            pdbInfoBox.classList.remove('hidden');
-            atomCountInfo.textContent = `Total Atoms: ${atoms.length} // Data Points`;
-
-            const totalUniqueLigands = ligands.length;
-            const totalLigandMolecules = ligands.reduce((sum, [, count]) => sum + count, 0);
-
-            if (totalUniqueLigands > 0) {
-                ligandCountInfo.textContent = `Unique Ligands: ${totalUniqueLigands} // Total Ligand Molecules: ${totalLigandMolecules}`;
-                ligandList.innerHTML = ''; // Clear previous list
-                ligands.forEach(([name, count]) => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `> ${name} (Count: ${count})`;
-                    ligandList.appendChild(listItem);
-                });
-            } else {
-                ligandCountInfo.textContent = `No Significant Ligands Detected // No External Modules`;
-                ligandList.innerHTML = '';
-            }
-        }
-
-        // --- Event Listeners ---
-
-        /**
-         * Event listener for the "Load PDB" button click.
-         * Fetches, parses, and renders the PDB structure.
-         */
-        loadPdbButton.addEventListener('click', async () => {
+        async function loadPdb() {
             const pdbId = pdbIdInput.value.trim();
             if (!pdbId) {
-                showMessage("Please enter a PDB ID to load // Input Required.", true);
+                showMessage('Please enter a PDB ID.', true);
                 return;
             }
 
             hideMessage();
-            hidePdbInfo(); // Hide info box until new data is loaded
             showLoading();
-            console.log(`Load PDB button clicked for ID: ${pdbId}`);
+            pdbInfoBox.classList.remove('is-visible'); // Hide info box during loading with animation
+            pdbInfoBox.classList.add('hidden'); // Ensure it's hidden for layout purposes
 
             try {
                 const pdbText = await fetchPdbData(pdbId);
-                const parsedData = parsePdb(pdbText);
-                loadedAtoms = parsedData.atoms; // Store parsed atoms
-                const ligands = parsedData.ligands;
+                const { atoms, ligands } = parsePdb(pdbText);
+                loadedAtoms = atoms; // Store for re-rendering on mode change
 
                 if (loadedAtoms.length === 0) {
-                    showMessage(`No valid atom data found for PDB ID: ${pdbId} // Data Corrupted.`, true);
-                    if (currentMoleculeGroup) {
-                        scene.remove(currentMoleculeGroup);
-                        currentMoleculeGroup.children.forEach(child => child.geometry.dispose());
-                        currentMoleculeGroup.children.forEach(child => child.material.dispose());
-                        currentMoleculeGroup = null;
-                    }
-                    resetCameraAndControls();
+                    showMessage(`No valid atoms found in PDB ID "${pdbId}".`, true);
+                    return;
+                }
+
+                // Get current render mode from radio buttons
+                const selectedRenderMode = document.querySelector('input[name="renderMode"]:checked').value;
+                renderMolecule(loadedAtoms, selectedRenderMode);
+
+                // Update info box
+                atomCountInfo.textContent = `Total Atoms: ${loadedAtoms.length}`;
+                ligandCountInfo.textContent = `Unique Ligands (excluding HOH): ${ligands.length}`;
+                ligandList.innerHTML = ''; // Clear previous list
+                if (ligands.length > 0) {
+                    ligands.forEach(([name, count]) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${name} (Count: ${count})`;
+                        ligandList.appendChild(listItem);
+                    });
                 } else {
-                    const selectedMode = document.querySelector('input[name="renderMode"]:checked').value;
-                    renderMolecule(loadedAtoms, selectedMode); // Render with selected mode
-                    displayPdbInfo(loadedAtoms, ligands); // Display PDB info
-                    showMessage(`Successfully loaded PDB ID: ${pdbId} with ${loadedAtoms.length} atoms // Render Complete.`, false);
+                    const listItem = document.createElement('li');
+                    listItem.textContent = 'No significant ligands detected.';
+                    ligandList.appendChild(listItem);
                 }
+                pdbInfoBox.classList.remove('hidden'); // Make it visible
+                pdbInfoBox.classList.add('is-visible'); // Trigger animation
+
+                showMessage(`PDB ID "${pdbId}" loaded successfully.`, false);
+
             } catch (error) {
-                showMessage(`Error: ${error.message} // Protocol Aborted.`, true);
-                console.error("Load PDB Error:", error);
-                if (currentMoleculeGroup) {
-                    scene.remove(currentMoleculeGroup);
-                    currentMoleculeGroup.children.forEach(child => child.geometry.dispose());
-                    currentMoleculeGroup.children.forEach(child => child.material.dispose());
-                    currentMoleculeGroup = null;
-                }
-                loadedAtoms = []; // Clear loaded atoms on error
-                hidePdbInfo(); // Hide info box on error
-                resetCameraAndControls();
+                console.error("Error loading PDB:", error);
+                showMessage(`Error: ${error.message}`, true);
             } finally {
                 hideLoading();
-                console.log('Loading process finished.');
             }
-        });
+        }
 
         /**
-         * Event listener for the "Reset View" button click.
-         * Calls the function to reset camera and controls.
+         * Resets the camera view to its initial position and target.
          */
-        resetViewButton.addEventListener('click', resetCameraAndControls);
+        function resetView() {
+            camera.position.copy(initialCameraPosition);
+            controls.target.copy(initialControlsTarget);
+            controls.update();
+            console.log('View reset to initial position.');
+        }
 
-        /**
-         * Event listeners for rendering mode radio buttons.
-         * Re-renders the molecule if one is already loaded.
-         */
+        // --- Event Listeners ---
+        loadPdbButton.addEventListener('click', loadPdb);
+        resetViewButton.addEventListener('click', resetView);
+
         renderModeRadios.forEach(radio => {
-            radio.addEventListener('change', (event) => {
-                const selectedMode = event.target.value;
-                console.log(`Render mode changed to: ${selectedMode}`);
+            radio.addEventListener('change', () => {
                 if (loadedAtoms.length > 0) {
-                    renderMolecule(loadedAtoms, selectedMode);
-                    showMessage(`Rendering mode changed to: ${event.target.labels[0].textContent.replace('//.*', '').trim()} // View Updated.`, false);
+                    // Re-render the molecule with the new mode if atoms are already loaded
+                    renderMolecule(loadedAtoms, radio.value);
+                    showMessage(`Render mode changed to ${radio.value}.`, false);
+                } else {
+                    showMessage('Load a PDB ID first to change render mode.', true);
                 }
             });
         });
 
-        // Removed proteinColorModeRadios event listener as the options are removed
-        // Removed proteinColorInput event listener as the options are removed
-        // Removed ligandColorInput event listener as the options are removed
+        // Initialize the Three.js scene when the window loads
+        window.onload = init;
 
-        function hidePdbInfo() {
-            pdbInfoBox.classList.add('hidden');
-            atomCountInfo.textContent = '';
-            ligandCountInfo.textContent = '';
-            ligandList.innerHTML = '';
-        }
-
-        // --- Initial Setup ---
-        window.onload = () => {
-            init();
-            onWindowResize(); // Set initial canvas size correctly
-            hidePdbInfo(); // Ensure info box is hidden on initial load
-        };
     </script>
 </body>
 </html>
