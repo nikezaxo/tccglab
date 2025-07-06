@@ -5,8 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Computational Chemistry Center</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  
+  <!-- Scripts for PDB Viewer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+
   <style>
-    /* --- General Styles --- */
+    /* --- General Styles from index.html --- */
     * {
       margin: 0;
       padding: 0;
@@ -16,7 +27,7 @@
     html, body {
       height: 100%;
       background: #000;
-      overflow-x: hidden; /* Keep this for overall page, but allow internal scroll */
+      overflow-x: hidden;
       color: #e0e0e0;
       scroll-behavior: smooth;
     }
@@ -80,7 +91,6 @@
       cursor: default;
     }
     
-    /* New Glitch Effect for Team Heading */
     #team-heading .letter {
         display: inline-block;
         transition: all 0.1s ease-in-out;
@@ -99,12 +109,8 @@
       scrollbar-width: thin;
       scrollbar-color: #00f7ff #222;
     }
-    .team-container::-webkit-scrollbar {
-        height: 8px;
-    }
-    .team-container::-webkit-scrollbar-track {
-        background: #222;
-    }
+    .team-container::-webkit-scrollbar { height: 8px; }
+    .team-container::-webkit-scrollbar-track { background: #222; }
     .team-container::-webkit-scrollbar-thumb {
         background-color: #00f7ff;
         border-radius: 10px;
@@ -144,110 +150,68 @@
         border-bottom-left-radius: 8px;
         border-bottom-right-radius: 8px;
     }
-    .member-name {
-        font-weight: bold;
-        font-size: 1rem;
-        margin: 0;
-    }
-    .member-degree {
-        font-size: 0.8rem;
-        margin: 5px 0 0 0;
-        color: #111;
-    }
+    .member-name { font-weight: bold; font-size: 1rem; margin: 0; }
+    .member-degree { font-size: 0.8rem; margin: 5px 0 0 0; color: #111; }
 
-    #innovation {
-      text-align: center;
-      margin: 60px 0;
-    }
+    #innovation { text-align: center; margin: 60px 0; }
 
-    /* New styles for innovation images container */
     .innovation-images-container {
         display: flex;
-        overflow-x: hidden; /* Hide scrollbar, JavaScript will handle scrolling */
+        overflow-x: hidden;
         gap: 30px;
         padding: 20px 0;
-        justify-content: flex-start; /* Align items to start for continuous scroll */
+        justify-content: flex-start;
         align-items: center;
         margin-top: 20px;
-        position: relative; /* For animation */
-        white-space: nowrap; /* Prevent items from wrapping */
+        position: relative;
+        white-space: nowrap;
     }
-
-    /* Styles for individual innovation images */
     .innovation-image {
-      width: 250px; /* Set a fixed width for desktop */
-      height: 180px; /* Set a fixed height for desktop */
+      width: 250px;
+      height: 180px;
       border-radius: 20px;
-      background-color: rgba(0, 0, 0, 0.5); /* Background for transparent GIFs */
-      cursor: pointer; /* Indicate it's clickable */
-      position: relative; /* Needed for pseudo-element positioning */
-      overflow: hidden; /* Crucial to clip the pseudo-element and scanline */
-      flex-shrink: 0; /* Prevent images from shrinking */
-      
-      /* Initial state for slide-in effect */
+      background-color: rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
       opacity: 0;
-      transform: translateX(100px); /* Start off-screen to the right */
-      transition: transform 0.5s ease, opacity 0.8s ease, box-shadow 0.3s ease; /* Added box-shadow to transition */
-
-      /* Pulsating glow effect */
+      transform: translateX(100px);
+      transition: transform 0.5s ease, opacity 0.8s ease, box-shadow 0.3s ease;
       box-shadow: 0 0 10px rgba(0, 247, 255, 0.5), 0 0 20px rgba(0, 247, 255, 0.3);
-      animation: pulsating-glow 2s infinite alternate; /* New pulsating glow animation */
+      animation: pulsating-glow 2s infinite alternate;
     }
-
-    /* Keyframes for pulsating glow */
     @keyframes pulsating-glow {
-      0% {
-        box-shadow: 0 0 10px rgba(0, 247, 255, 0.5), 0 0 20px rgba(0, 247, 255, 0.3);
-      }
-      100% {
-        box-shadow: 0 0 20px rgba(0, 247, 255, 0.8), 0 0 40px rgba(0, 247, 255, 0.6);
-      }
+      0% { box-shadow: 0 0 10px rgba(0, 247, 255, 0.5), 0 0 20px rgba(0, 247, 255, 0.3); }
+      100% { box-shadow: 0 0 20px rgba(0, 247, 255, 0.8), 0 0 40px rgba(0, 247, 255, 0.6); }
     }
-
-    /* Scanline effect (::after) */
     .innovation-image::after {
       content: '';
       position: absolute;
       top: 0;
-      left: -50%; /* Start off-screen to the left */
-      width: 50%; /* Width of the scanline */
+      left: -50%;
+      width: 50%;
       height: 100%;
       background: linear-gradient(to right, transparent, rgba(0, 247, 255, 0.6), transparent);
-      transform: skewX(-20deg); /* Angle the scanline */
-      animation: scanline-sweep 3s infinite linear; /* Animation for the sweep */
-      z-index: 3; /* Ensure it's above the image */
-      pointer-events: none; /* Allow clicks to pass through */
+      transform: skewX(-20deg);
+      animation: scanline-sweep 3s infinite linear;
+      z-index: 3;
+      pointer-events: none;
     }
-
-    /* Keyframes for the scanline sweep */
     @keyframes scanline-sweep {
-      0% {
-        left: -50%;
-      }
-      100% {
-        left: 100%;
-      }
+      0% { left: -50%; }
+      100% { left: 100%; }
     }
-
-    /* The actual image content, placed above the animated line */
     .innovation-image img {
       width: 100%;
       height: 100%;
-      border-radius: 8px; /* Slightly smaller border-radius for the image inside */
+      border-radius: 8px;
       object-fit: cover;
-      position: relative; /* Essential for z-index to work */
-      z-index: 2; /* Ensures the image is above the animated line */
-      /* Removed padding here, as the glow and scanline are now outside the image content */
+      position: relative;
+      z-index: 2;
     }
-
-    .innovation-image.is-visible {
-        opacity: 1;
-        transform: translateX(0); /* Slide into view */
-    }
-
-    .innovation-image:hover {
-      transform: scale(1.05); /* Slightly less aggressive hover scale */
-    }
+    .innovation-image.is-visible { opacity: 1; transform: translateX(0); }
+    .innovation-image:hover { transform: scale(1.05); }
 
     .matrix-text {
       color: #00f7ff;
@@ -261,10 +225,7 @@
       white-space: pre-wrap;
       min-height: 150px;
     }
-    .glow {
-      color: #00f7ff;
-      text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff, 0 0 20px #00f7ff;
-    }
+    .glow { color: #00f7ff; text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff, 0 0 20px #00f7ff; }
     .matrix-symbol {
       color: #e5f0e5;
       font-size: 1.5rem;
@@ -291,22 +252,14 @@
         box-shadow: 0 0 20px rgba(0, 247, 255, 0.7), 0 0 10px #00f7ff inset;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .chat-icon:hover {
-        transform: scale(1.1);
-    }
-    .chat-icon svg {
-        width: 32px;
-        height: 32px;
-        fill: #000;
-    }
+    .chat-icon:hover { transform: scale(1.1); }
+    .chat-icon svg { width: 32px; height: 32px; fill: #000; }
     .chatbot-modal {
-        display: none; /* This is correct, it's shown by JS */
+        display: none;
         position: fixed;
         z-index: 1001;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
         overflow: auto;
         background-color: rgba(0,0,0,0.7);
         backdrop-filter: blur(5px);
@@ -318,14 +271,11 @@
         border-radius: 10px;
         box-shadow: 0 0 25px rgba(0, 247, 255, 0.7);
         position: absolute;
-        bottom: 20px;
-        right: 20px;
-        width: 90%;
-        max-width: 400px;
-        height: 80%;
-        max-height: 720px;
+        bottom: 20px; right: 20px;
+        width: 90%; max-width: 400px;
+        height: 80%; max-height: 720px;
         display: flex;
-        flex-direction: column; /* Changed to column for proper iframe sizing */
+        flex-direction: column;
     }
     .chatbot-modal-header {
         padding: 10px 15px;
@@ -334,83 +284,50 @@
         align-items: center;
         border-bottom: 1px solid #00f7ff;
     }
-    .chatbot-modal-header p {
-        color: #00f7ff;
-        font-weight: bold;
-    }
-    .close-chatbot {
-        color: #00f7ff;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+    .chatbot-modal-header p { color: #00f7ff; font-weight: bold; }
+    .close-chatbot { color: #00f7ff; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close-chatbot:hover { color: #fff; }
-
-    /* Styles for the chatbot iframe container and iframe */
-    .chatbot-iframe-container {
-      flex-grow: 1; /* Allows the iframe container to take up available vertical space */
-      overflow: hidden; /* Hides any overflow from the iframe */
-      display: flex; /* Ensures the iframe fills its container */
-      position: relative; /* Needed for loading text positioning */
-    }
-    .chatbot-iframe-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none; /* Removes default iframe border */
-      border-radius: 0 0 8px 8px; /* Matches the bottom border-radius of the modal content */
-    }
-    /* Loading text for chatbot */
+    .chatbot-iframe-container { flex-grow: 1; overflow: hidden; display: flex; position: relative; }
+    .chatbot-iframe-container iframe { width: 100%; height: 100%; border: none; border-radius: 0 0 8px 8px; }
     #chatbot-loading {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       color: #00f7ff;
       text-align: center;
       padding: 20px;
       font-size: 1.1rem;
-      z-index: 1; /* Ensure it's above the iframe while loading */
+      z-index: 1;
     }
-
 
     /* --- Full Image Modal Styles --- */
     .full-image-modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 2000; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
-        backdrop-filter: blur(8px); /* Blur effect */
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.9);
+        backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
-        /* Removed display: flex from here, it's set by JS when opened */
         justify-content: center;
         align-items: center;
     }
-
     .full-image-modal-content {
         margin: auto;
         display: block;
-        max-width: 90%;
-        max-height: 90%;
-        object-fit: contain; /* Ensure image fits within bounds */
+        max-width: 90%; max-height: 90%;
+        object-fit: contain;
         border: 3px solid #00f7ff;
         border-radius: 15px;
         box-shadow: 0 0 30px rgba(0, 247, 255, 0.8);
         transition: transform 0.3s ease-out;
     }
-
-    .full-image-modal-content.zoomed {
-        transform: scale(1.1); /* Slight zoom effect when opened */
-    }
-
+    .full-image-modal-content.zoomed { transform: scale(1.1); }
     .close-full-image-modal {
         position: absolute;
-        top: 20px;
-        right: 35px;
+        top: 20px; right: 35px;
         color: #00f7ff;
         font-size: 40px;
         font-weight: bold;
@@ -418,108 +335,196 @@
         cursor: pointer;
         text-shadow: 0 0 10px #00f7ff;
     }
+    .close-full-image-modal:hover, .close-full-image-modal:focus { color: #fff; text-decoration: none; cursor: pointer; }
 
-    .close-full-image-modal:hover,
-    .close-full-image-modal:focus {
-        color: #fff;
-        text-decoration: none;
-        cursor: pointer;
+    /* --- Location Section --- */
+    #location { text-align: center; }
+    .map {
+      width: 100%;
+      height: 400px;
+      border: none;
+      margin: 20px auto 0 auto;
+      display: block;
     }
+    
+    /* --- STYLES FOR MERGED PDB VIEWER (Theme-aligned) --- */
+    #pdb-viewer-section {
+        font-family: 'Inter', monospace, sans-serif;
+        color: #00f7ff; /* Main theme color */
+    }
+    #pdb-viewer-section .pdb-container {
+        background-color: rgba(0, 50, 50, 0.15); /* Adjusted for cyan theme */
+        backdrop-filter: blur(5px);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 0 15px rgba(0, 247, 255, 0.4), inset 0 0 8px rgba(0, 247, 255, 0.2);
+        text-align: center;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(0, 247, 255, 0.3);
+    }
+    #pdb-viewer-section h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #00f7ff;
+        margin-bottom: 0.8rem;
+        text-shadow: 0 0 8px rgba(0, 247, 255, 0.8);
+        letter-spacing: 0.08em;
+    }
+    #pdb-viewer-section p {
+        font-size: 0.95rem;
+        color: #cccccc;
+        margin-bottom: 1rem;
+    }
+    #pdb-viewer-section .input-group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    #pdb-viewer-section input[type="text"] {
+        padding: 0.6rem 1rem;
+        border: 1px solid #00f7ff;
+        border-radius: 0.6rem;
+        background-color: rgba(0, 20, 20, 0.8); /* Adjusted for cyan theme */
+        color: #00f7ff;
+        font-size: 0.9rem;
+        flex-grow: 1;
+        max-width: 250px;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 0 4px rgba(0, 247, 255, 0.3);
+    }
+    #pdb-viewer-section input[type="text"]:focus {
+        outline: none;
+        border-color: #00f7ff;
+        box-shadow: 0 0 12px rgba(0, 247, 255, 0.8), inset 0 0 6px rgba(0, 247, 255, 0.5);
+    }
+    #pdb-viewer-section button {
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 8px rgba(0, 247, 255, 0.5);
+        background-color: rgba(0, 100, 100, 0.5); /* Adjusted for cyan theme */
+        color: #00f7ff;
+        border: 1px solid #00f7ff;
+    }
+    #pdb-viewer-section button:hover {
+        background-color: rgba(0, 150, 150, 0.7); /* Adjusted for cyan theme */
+        box-shadow: 0 0 20px rgba(0, 247, 255, 0.9);
+        transform: translateY(-2px);
+    }
+    #pdb-viewer-section .render-options, #pdb-viewer-section .color-options, #pdb-viewer-section .info-box {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding: 0.8rem;
+        background-color: rgba(0, 50, 50, 0.1); /* Adjusted for cyan theme */
+        border-radius: 0.6rem;
+        border: 1px solid rgba(0, 247, 255, 0.2);
+        color: #cccccc;
+        font-size: 0.85rem;
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+    #pdb-viewer-section .render-option-item, #pdb-viewer-section .color-option-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+        color: #cccccc;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+    #pdb-viewer-section .render-option-item:hover, #pdb-viewer-section .color-option-item:hover {
+        color: #00f7ff;
+    }
+    #pdb-viewer-section .info-box { padding: 1rem; margin-top: 1rem; font-size: 0.9rem; }
+    #pdb-viewer-section .info-box h2 { font-size: 1.1rem; margin-bottom: 0.6rem; text-shadow: 0 0 4px rgba(0, 247, 255, 0.5); }
+    #pdb-viewer-section .info-box p, #pdb-viewer-section .info-box ul { margin-bottom: 0.4rem; }
+    #pdb-viewer-section .info-box ul { max-height: 120px; padding: 0.4rem 0.8rem; overflow-y: auto; }
+    #pdb-viewer-section .info-box li { padding: 0.15rem 0; }
+    #pdb-viewer-section #messageBox {
+        margin-top: 1rem; padding: 0.6rem 1rem; border-radius: 0.4rem;
+        font-weight: 500; font-size: 0.85rem;
+        animation: matrixFadeIn 0.6s ease-out; border: 1px solid;
+    }
+    #pdb-viewer-section #messageBox.text-red-600 { background-color: rgba(139, 0, 0, 0.5); color: #ff6666; border-color: #ff0000; }
+    #pdb-viewer-section #messageBox.text-green-600 { background-color: rgba(0, 100, 100, 0.5); color: #00f7ff; border-color: #00f7ff; }
+    #pdb-viewer-section #pdb3dCanvas {
+        display: block;
+        background-color: #0a0a0a;
+        border-radius: 1rem;
+        box-shadow: 0 0 20px rgba(0, 247, 255, 0.6), inset 0 0 8px rgba(0, 247, 255, 0.3);
+        margin-top: 1.5rem;
+        border: 1px solid rgba(0, 247, 255, 0.3);
+        width: 100%;
+        height: 500px;
+    }
+    #pdb-viewer-section .loading-overlay {
+        font-size: 1.4rem;
+        animation: matrixFadeIn 0.8s ease-out forwards;
+        color: #00f7ff;
+        text-align: center;
+        padding: 2rem;
+    }
+    #pdb-viewer-section .spinner {
+        border: 6px solid rgba(0, 247, 255, 0.2);
+        border-top: 6px solid #00f7ff;
+        width: 60px; height: 60px;
+        margin: 0 auto 1rem auto;
+        box-shadow: 0 0 12px rgba(0, 247, 255, 0.7);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes matrixFadeIn {
+        0% { opacity: 0; transform: translateY(20px) scale(0.9) skewX(-5deg); filter: blur(5px); }
+        50% { filter: blur(2px); }
+        100% { opacity: 1; transform: translateY(0) scale(1) skewX(0deg); filter: blur(0); }
+    }
+    #pdb-viewer-section .info-box.is-visible { animation: matrixFadeIn 0.6s ease-out forwards; }
+    .hidden { display: none; }
+
 
     /* --- Responsive Media Queries --- */
     @media (min-width: 769px) {
-        .team-member:hover .team-member-info {
-            transform: translateY(0);
-        }
-        .team-member:hover img {
-            filter: brightness(0.7);
-        }
+        .team-member:hover .team-member-info { transform: translateY(0); }
+        .team-member:hover img { filter: brightness(0.7); }
     }
 
     @media (max-width: 768px) {
-      header h1 {
-        font-size: 1.8rem;
-      }
-      nav {
-        flex-direction: column;
-        gap: 10px;
-      }
-      .team-container {
-        flex-direction: column;
-        align-items: center;
-        overflow-x: hidden;
-      }
-      .team-member {
-        width: 250px;
-        height: 250px;
-      }
-      .member-name {
-        font-size: 1.1rem;
-      }
-      .member-degree {
-        font-size: 0.9rem;
-      }
-      .team-member.is-visible .team-member-info {
-        transform: translateY(0);
-      }
-      .team-member.is-visible img {
-        filter: brightness(0.7);
-      }
-      /* Mobile adjustments for innovation images */
-      .innovation-images-container {
-        flex-wrap: nowrap; /* Force horizontal layout on mobile */
-        overflow-x: hidden; /* Hide scrollbar for auto-circulating effect */
-        justify-content: flex-start; /* Align to start for continuous scroll */
-      }
-      .innovation-image {
-        width: 150px; /* Smaller width for mobile */
-        height: 100px; /* Smaller height for mobile */
-        min-width: unset; /* Remove min-width for mobile */
-      }
-      /* Adjust image padding for mobile */
-      .matrix-text {
-        font-size: 1rem;
-        padding: 15px;
-      }
-      .chatbot-modal-content {
-        width: calc(100% - 20px);
-        height: 75%;
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
-      }
-      .chat-icon {
-        bottom: 20px;
-        right: 20px;
-      }
-      .full-image-modal-content {
-        max-width: 95%;
-        max-height: 85%;
-      }
-      .close-full-image-modal {
-        font-size: 30px;
-        top: 10px;
-        right: 20px;
-      }
-    }
-
-    /* Centering and sizing for Location section */
-    #location {
-      text-align: center; /* Center content within the section */
-    }
-
-    .map {
-      width: 100%; /* Make map fill its container width */
-      height: 400px; /* Increase map height */
-      border: none;
-      margin: 20px auto 0 auto; /* Center map horizontally and add top margin */
-      display: block; /* Ensure it behaves as a block element for margin: auto */
-    }
-
-    @media (max-width: 768px) {
-      .map {
-        height: 300px; /* Adjust map height for smaller screens */
-      }
+      header h1 { font-size: 1.8rem; }
+      nav { flex-direction: column; gap: 10px; }
+      .team-container { flex-direction: column; align-items: center; overflow-x: hidden; }
+      .team-member { width: 250px; height: 250px; }
+      .member-name { font-size: 1.1rem; }
+      .member-degree { font-size: 0.9rem; }
+      .team-member.is-visible .team-member-info { transform: translateY(0); }
+      .team-member.is-visible img { filter: brightness(0.7); }
+      .innovation-images-container { flex-wrap: nowrap; overflow-x: hidden; justify-content: flex-start; }
+      .innovation-image { width: 150px; height: 100px; min-width: unset; }
+      .matrix-text { font-size: 1rem; padding: 15px; }
+      .chatbot-modal-content { width: calc(100% - 20px); height: 75%; left: 10px; right: 10px; bottom: 10px; }
+      .chat-icon { bottom: 20px; right: 20px; }
+      .full-image-modal-content { max-width: 95%; max-height: 85%; }
+      .close-full-image-modal { font-size: 30px; top: 10px; right: 20px; }
+      .map { height: 300px; }
+      
+      /* Responsive for PDB viewer */
+      #pdb-viewer-section .pdb-container { padding: 1rem; margin-bottom: 1rem; }
+      #pdb-viewer-section h1 { font-size: 1.6rem; }
+      #pdb-viewer-section p { font-size: 0.85rem; }
+      #pdb-viewer-section .input-group { gap: 0.5rem; }
+      #pdb-viewer-section input[type="text"], #pdb-viewer-section button { padding: 0.5rem 1rem; font-size: 0.8rem; }
+      #pdb-viewer-section .render-options, #pdb-viewer-section .color-options, #pdb-viewer-section .info-box { gap: 0.5rem; padding: 0.6rem; font-size: 0.8rem; }
+      #pdb-viewer-section #pdb3dCanvas { margin-top: 1rem; height: 350px; }
     }
   </style>
 </head>
@@ -535,6 +540,7 @@
     <a href="#about">About Us</a>
     <a href="#services">Services</a>
     <a href="#team">Team</a>
+    <a href="#pdb-viewer-section">3D Viewer</a>
     <a href="#contact">Contact</a>
     <a href="#location">Location</a>
   </nav>
@@ -562,38 +568,23 @@
       <div class="team-container">
         <div class="team-member">
           <img src="hyder.jpeg" alt="Dr. Hyder A A" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Dr.+Hyder'"/>
-          <div class="team-member-info">
-            <p class="member-name">Dr. Hyder A A</p>
-            <p class="member-degree">Ph.D. in computational Chemistry</p>
-          </div>
+          <div class="team-member-info"><p class="member-name">Dr. Hyder A A</p><p class="member-degree">Ph.D. in computational Chemistry</p></div>
         </div>
         <div class="team-member">
           <img src="shinwar.jpeg" alt="Dr. Shinwar" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Dr.+Shinwar'"/>
-          <div class="team-member-info">
-            <p class="member-name">Dr. Shinwar</p>
-            <p class="member-degree">Ph.D. in Physics</p>
-          </div>
+          <div class="team-member-info"><p class="member-name">Dr. Shinwar</p><p class="member-degree">Ph.D. in Physics</p></div>
         </div>
         <div class="team-member">
           <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Mr. dilzhar S" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Mr.+Dilzhar'"/>
-          <div class="team-member-info">
-            <p class="member-name">Mr. dilzhar S</p>
-            <p class="member-degree">M.Sc. in physical. Chem.</p>
-          </div>
+          <div class="team-member-info"><p class="member-name">Mr. dilzhar S</p><p class="member-degree">M.Sc. in physical. Chem.</p></div>
         </div>
         <div class="team-member">
           <img src="nihad.jpeg" alt="Dev . Nihad R" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Dev.+Nihad'"/>
-           <div class="team-member-info">
-            <p class="member-name">Dev. Nihad R</p>
-            <p class="member-degree">Research Assistant</p>
-          </div>
+           <div class="team-member-info"><p class="member-name">Dev. Nihad R</p><p class="member-degree">Research Assistant</p></div>
         </div>
         <div class="team-member">
           <img src="ahmad.jpeg" alt="Ahmad KH" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/00f7ff?text=Ahmad+KH'"/>
-           <div class="team-member-info">
-            <p class="member-name">Ahmad KH</p>
-            <p class="member-degree">Research Assistant</p>
-          </div>
+           <div class="team-member-info"><p class="member-name">Ahmad KH</p><p class="member-degree">Research Assistant</p></div>
         </div>
       </div>
     </section>
@@ -601,38 +592,50 @@
     <section id="innovation">
       <h2>Our Innovation</h2>
       <div class="innovation-images-container" id="innovation-carousel">
-        <!-- Original image -->
-        <div class="innovation-image">
-          <img src="idea.png" alt="Innovative Idea" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+GIF'"/>
-        </div>
-        <!-- New images -->
-        <div class="innovation-image">
-          <img src="idea1.gif" alt="Innovative Idea 1" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+1+GIF'"/>
-        </div>
-        <div class="innovation-image">
-          <img src="idea2.png" alt="Innovative Idea 2" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+2+PNG'"/>
-        </div>
-        <div class="innovation-image">
-          <img src="idea3.png" alt="Innovative Idea 3" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+3+PNG'"/>
-        </div>
-        <div class="innovation-image">
-          <img src="idea4.png" alt="Innovative Idea 4" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+4+PNG'"/>
-        </div>
+        <div class="innovation-image"><img src="idea.png" alt="Innovative Idea" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+GIF'"/></div>
+        <div class="innovation-image"><img src="idea1.gif" alt="Innovative Idea 1" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+1+GIF'"/></div>
+        <div class="innovation-image"><img src="idea2.png" alt="Innovative Idea 2" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+2+PNG'"/></div>
+        <div class="innovation-image"><img src="idea3.png" alt="Innovative Idea 3" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+3+PNG'"/></div>
+        <div class="innovation-image"><img src="idea4.png" alt="Innovative Idea 4" onerror="this.onerror=null;this.src='https://placehold.co/300x200/00f7ff/000?text=Idea+4+PNG'"/></div>
       </div>
       <div class="matrix-text" id="matrix-effect" data-text="At TCCG, we specialize in advanced molecular dynamics simulations to unlock molecular mechanisms at the nanoscale. Our work accelerates drug discovery, protein-ligand binding analysis, and computational insight into complex biochemical systems. We empower clients with high-performance computing solutions tailored to real scientific challenges."></div>
     </section>
     
-    <h2 style="color: #9ee1e4; text-align: center; margin-bottom: 20px; text-shadow: 0 0 8px #00ff00;">Explore Protein Structures</h2>
-<div style="text-align: center; margin-bottom: 40px;">
-    <iframe src="pdbviewer.html"
-        width="90%"
-        height="900px" /* Or a smaller value like 400px, 350px */
-        frameborder="2"
-        allow ="autoplay;"
-        allowfullscreen
-        style="border-radius: 1.25rem; box-shadow: 0 0 25px rgba(83, 219, 253, 0.6), inset 0 0 10px rgba(16, 142, 180, 0.3); max-width: 700px; /* Optional: limit max width */ margin: 0 auto; display: block;">
-     </iframe>
-</div>
+    <!-- MERGED PDB VIEWER SECTION -->
+    <section id="pdb-viewer-section">
+        <div class="pdb-container">
+            <h1>PDB 3D Viewer // System Online</h1>
+            <p>Accessing molecular structures from the RCSB PDB database. Select visualization mode.</p>
+            <div class="input-group">
+                <input type="text" id="pdbIdInput" placeholder="Enter PDB ID (e.g., 1CRN, 4HHB)">
+                <button id="loadPdbButton">Load PDB // Execute</button>
+                <button id="resetViewButton">Reset View // Recalibrate</button>
+            </div>
+    
+            <div class="render-options">
+                <label class="render-option-item"><input type="radio" name="renderMode" value="line" checked> Line // ViewDefault</label>
+                <label class="render-option-item"><input type="radio" name="renderMode" value="ballAndStick"> Ball-and-Stick // Skeletal View</label>
+                <label class="render-option-item"><input type="radio" name="renderMode" value="spaceFilling"> Space-Filling // CPK Volume</label>
+                <label class="render-option-item"><input type="radio" name="renderMode" value="wireframe"> Wireframe // Mesh Outline</label>
+            </div>
+    
+            <div id="messageBox" class="hidden"></div>
+    
+            <div id="pdbInfoBox" class="info-box hidden">
+                <h2>PDB Data // Analysis Report</h2>
+                <p id="atomCountInfo"></p>
+                <p id="ligandCountInfo"></p>
+                <ul id="ligandList"></ul>
+            </div>
+        </div>
+    
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <p>Loading PDB data // Initiating Protocol...</p>
+        </div>
+    
+        <canvas id="pdb3dCanvas"></canvas>
+    </section>
 
     <section id="contact">
       <h2>Contact Us <span class="matrix-symbol" id="matrix-symbol">⠿</span></h2>
@@ -649,7 +652,7 @@
   
   <!-- Page Footer -->
   <footer>
-    <div style="text-align: center;">
+    <div style="text-align: center; padding: 20px 0;">
       <p>© 2025 Computational Chemistry Center, Zakho University. All rights reserved.</p>
     </div>
   </footer>
@@ -661,12 +664,9 @@
 
   <div id="chatbot-modal" class="chatbot-modal">
       <div class="chatbot-modal-content">
-          <div class="chatbot-modal-header">
-              <p>AI Assistant</p>
-              <span id="close-chatbot" class="close-chatbot">&times;</span>
-          </div>
+          <div class="chatbot-modal-header"><p>AI Assistant</p><span id="close-chatbot" class="close-chatbot">&times;</span></div>
           <div class="chatbot-iframe-container">
-              <div id="chatbot-loading" style="color: #00f7ff; text-align: center; padding: 20px;">Loading AI Assistant...</div>
+              <div id="chatbot-loading">Loading AI Assistant...</div>
               <iframe src="https://www.chatbase.co/chatbot-iframe/7nAceRz4VtIakEojiLmW3" title="Chatbot" onload="document.getElementById('chatbot-loading').style.display='none';"></iframe>
           </div>
       </div>
@@ -678,11 +678,10 @@
     <img class="full-image-modal-content" id="img01">
   </div>
 
-
+  <!-- Main page script -->
   <script>
     // --- Matrix Text Animation Effect ---
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
     function matrixEffect(el, finalText, delay = 25, iterations = 3) {
       return new Promise(resolve => {
         let frame = 0;
@@ -707,54 +706,35 @@
       await matrixEffect(document.getElementById("who-text"), document.getElementById("who-text").textContent, 10);
       await matrixEffect(document.getElementById("services-heading"), "Our Services", 25);
       const services = document.querySelectorAll("#services li");
-      for(const service of services) {
-        await matrixEffect(service, service.textContent);
-      }
-      // The team heading animation is handled by the glitch effect function
+      for(const service of services) { await matrixEffect(service, service.textContent); }
     }
     
-    // New Glitch Animation for "Our Team"
     function setupGlitchEffect() {
         const heading = document.getElementById('team-heading');
         if (!heading) return;
-
         const originalText = heading.textContent;
-        heading.innerHTML = ''; // Clear the heading
+        heading.innerHTML = '';
         const letters = originalText.split('').map(letter => {
             const span = document.createElement('span');
             span.className = 'letter';
-            span.textContent = letter === ' ' ? '\u00A0' : letter; // Use non-breaking space
+            span.textContent = letter === ' ' ? '\u00A0' : letter;
             heading.appendChild(span);
             return span;
         });
-
-        // Main interval to trigger the glitch burst every 4 seconds
         setInterval(() => {
-            // How long the burst of glitches should last
-            const burstDuration = 1000; // 1 second
-            // How often a letter glitches during the burst
+            const burstDuration = 1000;
             const glitchIntervalTime = 100;
-
             const glitchBurstInterval = setInterval(() => {
                 const randomIndex = Math.floor(Math.random() * letters.length);
                 const randomLetter = letters[randomIndex];
-
                 if(randomLetter) {
                     randomLetter.classList.add('letter-glitch');
-                    setTimeout(() => {
-                        randomLetter.classList.remove('letter-glitch');
-                    }, Math.random() * 200 + 50);
+                    setTimeout(() => { randomLetter.classList.remove('letter-glitch'); }, Math.random() * 200 + 50);
                 }
             }, glitchIntervalTime);
-
-            // Stop the burst after the specified duration
-            setTimeout(() => {
-                clearInterval(glitchBurstInterval);
-            }, burstDuration);
-
-        }, 4000); // Repeat every 4 seconds
+            setTimeout(() => { clearInterval(glitchBurstInterval); }, burstDuration);
+        }, 4000);
     }
-
 
     async function animateInnovationText() {
       const innovationDiv = document.getElementById("matrix-effect");
@@ -762,200 +742,371 @@
       await matrixEffect(innovationDiv, text, 10, 3);
     }
 
-    // --- Mobile Scroll Animation for Team Section ---
     function setupTeamScrollAnimation() {
+        if (window.innerWidth > 768) return;
         const teamMembers = document.querySelectorAll('.team-member');
-        
-        if (window.innerWidth <= 768) {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.5
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                    } else {
-                        entry.target.classList.remove('is-visible');
-                    }
-                });
-            }, observerOptions);
-
-            teamMembers.forEach(member => {
-                observer.observe(member);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                entry.target.classList.toggle('is-visible', entry.isIntersecting);
             });
-        }
+        }, { threshold: 0.5 });
+        teamMembers.forEach(member => observer.observe(member));
     }
 
-    // --- New Scroll Slide Right Effect for Innovation Images ---
     function setupInnovationImageScrollEffect() {
         const innovationImages = document.querySelectorAll('.innovation-image');
-        
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.2 // Trigger when 20% of the image is visible
-        };
-
         const observer = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    // Optional: Stop observing once it's visible to prevent re-triggering
                     observer.unobserve(entry.target); 
                 }
             });
-        }, observerOptions);
-
-        innovationImages.forEach(image => {
-            observer.observe(image);
-        });
+        }, { threshold: 0.2 });
+        innovationImages.forEach(image => observer.observe(image));
     }
 
-
-    // Blinking matrix symbol
     const matrixSymbol = document.getElementById("matrix-symbol");
-    setInterval(() => {
-      matrixSymbol.style.opacity = matrixSymbol.style.opacity === "1" ? "0.3" : "1";
-    }, 500);
+    setInterval(() => { matrixSymbol.style.opacity = matrixSymbol.style.opacity === "1" ? "0.3" : "1"; }, 500);
     
-    // --- Chatbot Modal Logic ---
     const chatIcon = document.getElementById('chat-icon');
     const chatbotModal = document.getElementById('chatbot-modal');
     const closeChatbotButton = document.getElementById('close-chatbot');
-
     chatIcon.addEventListener('click', () => { chatbotModal.style.display = 'block'; });
     closeChatbotButton.addEventListener('click', () => { chatbotModal.style.display = 'none'; });
-    window.addEventListener('click', (event) => {
-        if (event.target == chatbotModal) {
-            chatbotModal.style.display = 'none';
-        }
-    });
+    window.addEventListener('click', (event) => { if (event.target == chatbotModal) { chatbotModal.style.display = 'none'; } });
 
-    // --- Full Image Modal (Lightbox) Logic ---
     const fullImageModal = document.getElementById("fullImageModal");
     const fullImage = document.getElementById("img01");
     const closeFullImageModal = document.getElementsByClassName("close-full-image-modal")[0];
-    // Select the .innovation-image divs, not the img tags directly for click listener
     const innovationImageContainers = document.querySelectorAll('.innovation-image'); 
-
     innovationImageContainers.forEach(container => {
         container.addEventListener('click', function() {
-            fullImageModal.style.display = "flex"; // Use flex to center content
-            // Get the src from the img element INSIDE this container
+            fullImageModal.style.display = "flex";
             fullImage.src = this.querySelector('img').src; 
-            fullImage.classList.add('zoomed'); // Add zoom effect
-            // Remove zoom class after animation to prepare for next open
+            fullImage.classList.add('zoomed');
             setTimeout(() => fullImage.classList.remove('zoomed'), 300); 
         });
     });
+    closeFullImageModal.addEventListener('click', () => { fullImageModal.style.display = "none"; });
+    fullImageModal.addEventListener('click', (event) => { if (event.target === fullImageModal) { fullImageModal.style.display = "none"; } });
 
-    closeFullImageModal.addEventListener('click', function() {
-        fullImageModal.style.display = "none";
-    });
-
-    // Close the modal if user clicks outside the image content
-    fullImageModal.addEventListener('click', function(event) {
-        if (event.target === fullImageModal) {
-            fullImageModal.style.display = "none";
-        }
-    });
-
-    // --- Automatic Horizontal Scroll for Innovation Images ---
     function autoScrollInnovationImages() {
         const container = document.getElementById('innovation-carousel');
-        if (!container) return; // Exit if container not found
-
-        let scrollAmount = 0;
-        const scrollSpeed = 0.5; // Adjust speed as needed (pixels per frame)
+        if (!container) return;
         let animationFrameId;
-
         const scroll = () => {
-            container.scrollLeft += scrollSpeed;
-
-            // If scrolled to the end, reset to beginning (loop)
-            if (container.scrollLeft >= (container.scrollWidth - container.clientWidth)) {
-                container.scrollLeft = 0;
-            }
+            container.scrollLeft += 0.5;
+            if (container.scrollLeft >= (container.scrollWidth - container.clientWidth)) { container.scrollLeft = 0; }
             animationFrameId = requestAnimationFrame(scroll);
         };
-
-        // Start scrolling when the container is visible
         const carouselObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    if (!animationFrameId) { // Only start if not already running
-                        scroll();
-                    }
-                } else {
-                    if (animationFrameId) {
-                        cancelAnimationFrame(animationFrameId);
-                        animationFrameId = null;
-                    }
-                }
+                if (entry.isIntersecting) { if (!animationFrameId) { scroll(); } } 
+                else { if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; } }
             });
-        }, { threshold: 0.1 }); // Observe when 10% of the carousel is visible
-
+        }, { threshold: 0.1 });
         carouselObserver.observe(container);
+        container.addEventListener('mouseenter', () => { if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; } });
+        container.addEventListener('mouseleave', () => { if (!animationFrameId) { scroll(); } });
+        container.addEventListener('touchstart', () => { if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; } });
+        container.addEventListener('touchend', () => { if (!animationFrameId) { scroll(); } });
+    }
+  </script>
 
-        // Optional: Pause on hover/touch
-        container.addEventListener('mouseenter', () => {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-        });
-        container.addEventListener('mouseleave', () => {
-            if (!animationFrameId) { // Only restart if not already running
-                scroll();
-            }
-        });
-        // For touch devices
-        container.addEventListener('touchstart', () => {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-        });
-        container.addEventListener('touchend', () => {
-            if (!animationFrameId) { // Only restart if not already running
-                scroll();
-            }
-        });
+  <!-- PDB Viewer Script -->
+  <script>
+    // --- Three.js Global Variables ---
+    let scene, camera, renderer, controls;
+    let composer;
+    let initialCameraPosition = new THREE.Vector3(0, 0, 50);
+    let initialControlsTarget = new THREE.Vector3(0, 0, 0);
+    let loadedAtoms = [];
+    let currentMoleculeGroup;
+    const MODEL_SCALE_FACTOR = 0.7;
+
+    // --- DOM Elements ---
+    const pdbIdInput = document.getElementById('pdbIdInput');
+    const loadPdbButton = document.getElementById('loadPdbButton');
+    const resetViewButton = document.getElementById('resetViewButton');
+    const pdb3dCanvas = document.getElementById('pdb3dCanvas');
+    const messageBox = document.getElementById('messageBox');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const renderModeRadios = document.querySelectorAll('input[name="renderMode"]');
+    const pdbInfoBox = document.getElementById('pdbInfoBox');
+    const atomCountInfo = document.getElementById('atomCountInfo');
+    const ligandCountInfo = document.getElementById('ligandCountInfo');
+    const ligandList = document.getElementById('ligandList');
+
+    // --- Molecular Data Constants ---
+    const ATOM_RADII_BALL_AND_STICK = {'H':0.25,'C':0.7,'N':0.65,'O':0.6,'S':1,'P':0.95,'F':0.6,'Cl':1,'Br':1.15,'I':1.4,'He':0.5,'Ne':0.7,'Ar':0.9,'Kr':1,'Xe':1.1,'Li':1.45,'Na':1.8,'K':2.2,'Rb':2.35,'Cs':2.6,'Mg':1.5,'Ca':1.8,'Fe':1.25,'Zn':1.35,'UNKNOWN':0.7};
+    const ATOM_RADII_SPACE_FILLING = {'H':1.2,'C':1.7,'N':1.55,'O':1.52,'S':1.8,'P':1.8,'F':1.47,'Cl':1.75,'Br':1.85,'I':1.98,'He':1.4,'Ne':1.54,'Ar':1.88,'Kr':2.02,'Xe':2.16,'Li':1.82,'Na':2.27,'K':2.75,'Rb':2.95,'Cs':3.43,'Mg':1.73,'Ca':2.31,'Fe':1.25,'Zn':1.39,'UNKNOWN':1.7};
+    const ATOM_RADII_LINE = {'H':0.1,'C':0.1,'N':0.1,'O':0.1,'S':0.1,'P':0.1,'F':0.1,'Cl':0.1,'Br':0.1,'I':0.1,'He':0.1,'Ne':0.1,'Ar':0.1,'Kr':0.1,'Xe':0.1,'Li':0.1,'Na':0.1,'K':0.1,'Rb':0.1,'Cs':0.1,'Mg':0.1,'Ca':0.1,'Fe':0.1,'Zn':0.1,'UNKNOWN':0.1};
+    const PYMOL_CPK_COLORS = {'C':0xC0C0C0,'O':0xFF0000,'N':0x0000FF,'S':0xFFFF00,'P':0xFF8C00,'H':0xFFFFFF,'F':0x00FF00,'Cl':0x00FF00,'Br':0x8B4513,'I':0x9400D3,'Fe':0xD2691E,'Zn':0x708090,'Na':0x0000CD,'K':0x8A2BE2,'Ca':0x696969,'Mg':0x006400,'UNKNOWN':0xAAAAAA};
+    const PDB_VIEWER_ACCENT_COLOR = 0x00f7ff; // Theme-aligned color
+    const BOND_RADIUS = 0.15 * MODEL_SCALE_FACTOR;
+    const BOND_THRESHOLD = 1.8;
+    const LIGAND_COLOR = new THREE.Color(0xFF0000);
+
+    Object.keys(ATOM_RADII_BALL_AND_STICK).forEach(k => ATOM_RADII_BALL_AND_STICK[k] *= MODEL_SCALE_FACTOR);
+    Object.keys(ATOM_RADII_SPACE_FILLING).forEach(k => ATOM_RADII_SPACE_FILLING[k] *= MODEL_SCALE_FACTOR);
+    Object.keys(ATOM_RADII_LINE).forEach(k => ATOM_RADII_LINE[k] *= MODEL_SCALE_FACTOR);
+
+    function initPdbViewer() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        camera = new THREE.PerspectiveCamera(75, pdb3dCanvas.clientWidth / pdb3dCanvas.clientHeight, 0.1, 1000);
+        camera.position.copy(initialCameraPosition);
+        renderer = new THREE.WebGLRenderer({ canvas: pdb3dCanvas, antialias: true });
+        renderer.setSize(pdb3dCanvas.clientWidth, pdb3dCanvas.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 5;
+        controls.maxDistance = 500;
+        controls.target.copy(initialControlsTarget);
+        scene.add(new THREE.AmbientLight(0x606060));
+        const dirLight1 = new THREE.DirectionalLight(PDB_VIEWER_ACCENT_COLOR, 0.5); // Use theme color
+        dirLight1.position.set(1, 1, 1).normalize();
+        scene.add(dirLight1);
+        const dirLight2 = new THREE.DirectionalLight(0xFFFFFF, 0.3);
+        dirLight2.position.set(-1, -1, -1).normalize();
+        scene.add(dirLight2);
+        currentMoleculeGroup = new THREE.Group();
+        scene.add(currentMoleculeGroup);
+        composer = new THREE.EffectComposer(renderer);
+        composer.addPass(new THREE.RenderPass(scene, camera));
+        composer.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(pdb3dCanvas.clientWidth, pdb3dCanvas.clientHeight), 0.7, 0.3, 0.7));
+        window.addEventListener('resize', onWindowResize, false);
+        animatePdb();
     }
 
+    function onWindowResize() {
+        const canvasWidth = pdb3dCanvas.clientWidth;
+        const canvasHeight = pdb3dCanvas.clientHeight;
+        if(canvasWidth > 0 && canvasHeight > 0) {
+            renderer.setSize(canvasWidth, canvasHeight);
+            camera.aspect = canvasWidth / canvasHeight;
+            camera.updateProjectionMatrix();
+            composer.setSize(canvasWidth, canvasHeight);
+        }
+    }
 
-    // --- Window Onload Logic ---
-    window.onload = () => {
-      runMatrix().then(() => animateInnovationText());
-      setupTeamScrollAnimation();
-      setupGlitchEffect(); // Activate the new glitch animation
-      setupInnovationImageScrollEffect(); // Activate the new innovation image scroll effect
-      autoScrollInnovationImages(); // Activate automatic horizontal scroll
-    };
+    function animatePdb() {
+        requestAnimationFrame(animatePdb);
+        controls.update();
+        composer.render();
+    }
+
+    function showMessage(message, isError = false) {
+        messageBox.textContent = message;
+        messageBox.className = 'mt-4'; // Reset classes
+        messageBox.classList.add(isError ? 'text-red-600' : 'text-green-600');
+    }
+
+    function showLoading() { loadingOverlay.classList.remove('hidden'); }
+    function hideLoading() { loadingOverlay.classList.add('hidden'); }
+
+    async function fetchPdbData(pdbId) {
+        const url = `https://files.rcsb.org/download/${pdbId.toUpperCase()}.pdb`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`PDB ID "${pdbId}" not found or network error.`);
+        const text = await response.text();
+        if (text.includes("Invalid PDB ID")) throw new Error(`PDB ID "${pdbId}" is invalid.`);
+        return text;
+    }
+
+    function parsePdb(pdbText) {
+        const atoms = [];
+        const ligandsMap = new Map();
+        pdbText.split('\n').forEach(line => {
+            const recordType = line.substring(0, 6).trim();
+            if (recordType === 'ATOM' || recordType === 'HETATM') {
+                const x = parseFloat(line.substring(30, 38));
+                const y = parseFloat(line.substring(38, 46));
+                const z = parseFloat(line.substring(46, 54));
+                const element = line.substring(76, 78).trim();
+                const resName = line.substring(17, 20).trim();
+                if (!isNaN(x)) {
+                    const isHETATM = (recordType === 'HETATM');
+                    atoms.push({ x, y, z, element, isHETATM, resName });
+                    if (isHETATM && resName !== 'HOH') {
+                        ligandsMap.set(resName, (ligandsMap.get(resName) || 0) + 1);
+                    }
+                }
+            }
+        });
+        return { atoms, ligands: Array.from(ligandsMap.entries()) };
+    }
+
+    function renderMolecule(atoms, mode) {
+        if (currentMoleculeGroup) {
+            scene.remove(currentMoleculeGroup);
+            currentMoleculeGroup.traverse(child => {
+                if(child.geometry) child.geometry.dispose();
+                if(child.material) {
+                    if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+                    else child.material.dispose();
+                }
+            });
+        }
+        currentMoleculeGroup = new THREE.Group();
+        scene.add(currentMoleculeGroup);
+
+        let currentAtomRadii, wireframeEnabled = false, renderBondsAsCylinders = false, renderBondsAsLines = false;
+        const bondColor = new THREE.Color(0x333333);
+
+        switch (mode) {
+            case 'ballAndStick': currentAtomRadii = ATOM_RADII_BALL_AND_STICK; renderBondsAsCylinders = true; break;
+            case 'spaceFilling': currentAtomRadii = ATOM_RADII_SPACE_FILLING; break;
+            case 'wireframe': currentAtomRadii = ATOM_RADII_BALL_AND_STICK; wireframeEnabled = true; renderBondsAsCylinders = true; break;
+            case 'line': currentAtomRadii = ATOM_RADII_LINE; renderBondsAsLines = true; break;
+            default: currentAtomRadii = ATOM_RADII_BALL_AND_STICK; renderBondsAsCylinders = true;
+        }
+
+        const sphereGeometry = new THREE.SphereGeometry(1, 16, 16);
+        const dummy = new THREE.Object3D();
+        const instancedMaterial = wireframeEnabled ? new THREE.MeshBasicMaterial({ color: PDB_VIEWER_ACCENT_COLOR, wireframe: true }) : new THREE.MeshPhongMaterial({ shininess: 50, specular: 0x111111, emissive: 0x101010, vertexColors: true });
+        const instancedAtoms = new THREE.InstancedMesh(sphereGeometry, instancedMaterial, atoms.length);
+        instancedAtoms.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        if (!wireframeEnabled) instancedAtoms.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(atoms.length * 3), 3);
+
+        atoms.forEach((atom, i) => {
+            const radius = currentAtomRadii[atom.element] || currentAtomRadii['UNKNOWN'];
+            const atomColor = atom.isHETATM ? LIGAND_COLOR : new THREE.Color(PYMOL_CPK_COLORS[atom.element] || PYMOL_CPK_COLORS['UNKNOWN']);
+            dummy.position.set(atom.x, atom.y, atom.z);
+            dummy.scale.set(radius, radius, radius);
+            dummy.updateMatrix();
+            instancedAtoms.setMatrixAt(i, dummy.matrix);
+            if (!wireframeEnabled) atomColor.toArray(instancedAtoms.instanceColor.array, i * 3);
+        });
+        instancedAtoms.instanceMatrix.needsUpdate = true;
+        if (!wireframeEnabled) instancedAtoms.instanceColor.needsUpdate = true;
+        currentMoleculeGroup.add(instancedAtoms);
+
+        if (renderBondsAsCylinders || renderBondsAsLines) {
+            const bondMaterial = wireframeEnabled ? new THREE.MeshBasicMaterial({ color: PDB_VIEWER_ACCENT_COLOR, wireframe: true }) : new THREE.MeshPhongMaterial({ color: bondColor, shininess: 30, specular: 0x050505 });
+            const lineBondMaterial = new THREE.LineBasicMaterial({ color: PDB_VIEWER_ACCENT_COLOR });
+            const bondVertices = [];
+            for (let i = 0; i < atoms.length; i++) {
+                for (let j = i + 1; j < atoms.length; j++) {
+                    const atom1 = atoms[i], atom2 = atoms[j];
+                    const dist = Math.sqrt(Math.pow(atom1.x - atom2.x, 2) + Math.pow(atom1.y - atom2.y, 2) + Math.pow(atom1.z - atom2.z, 2));
+                    if (dist < BOND_THRESHOLD) {
+                        if (renderBondsAsCylinders) {
+                            const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(BOND_RADIUS, BOND_RADIUS, dist, 8), bondMaterial);
+                            cylinder.position.set((atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2);
+                            const direction = new THREE.Vector3(atom2.x - atom1.x, atom2.y - atom1.y, atom2.z - atom1.z).normalize();
+                            cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
+                            currentMoleculeGroup.add(cylinder);
+                        } else if (renderBondsAsLines) {
+                            bondVertices.push(atom1.x, atom1.y, atom1.z, atom2.x, atom2.y, atom2.z);
+                        }
+                    }
+                }
+            }
+            if (renderBondsAsLines && bondVertices.length > 0) {
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(bondVertices, 3));
+                currentMoleculeGroup.add(new THREE.LineSegments(geometry, lineBondMaterial));
+            }
+        }
+
+        if (atoms.length > 0) {
+            const box = new THREE.Box3().setFromObject(currentMoleculeGroup);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            currentMoleculeGroup.position.sub(center);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const fov = camera.fov * (Math.PI / 180);
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
+            camera.position.set(0, 0, cameraZ);
+            controls.target.copy(new THREE.Vector3(0,0,0));
+            controls.update();
+        } else { resetView(); }
+    }
+
+    async function loadPdb() {
+        const pdbId = pdbIdInput.value.trim();
+        if (!pdbId) { showMessage('Please enter a PDB ID.', true); return; }
+        messageBox.classList.add('hidden');
+        showLoading();
+        pdbInfoBox.classList.remove('is-visible');
+        pdbInfoBox.classList.add('hidden');
+        try {
+            const pdbText = await fetchPdbData(pdbId);
+            const { atoms, ligands } = parsePdb(pdbText);
+            loadedAtoms = atoms;
+            if (loadedAtoms.length === 0) { showMessage(`No valid atoms found in PDB ID "${pdbId}".`, true); return; }
+            const selectedRenderMode = document.querySelector('input[name="renderMode"]:checked').value;
+            renderMolecule(loadedAtoms, selectedRenderMode);
+            atomCountInfo.textContent = `Total Atoms: ${loadedAtoms.length}`;
+            ligandCountInfo.textContent = `Unique Ligands (excluding HOH): ${ligands.length}`;
+            ligandList.innerHTML = '';
+            if (ligands.length > 0) {
+                ligands.forEach(([name, count]) => { ligandList.innerHTML += `<li>${name} (Count: ${count})</li>`; });
+            } else { ligandList.innerHTML = '<li>No significant ligands detected.</li>'; }
+            pdbInfoBox.classList.remove('hidden');
+            pdbInfoBox.classList.add('is-visible');
+            showMessage(`PDB ID "${pdbId}" loaded successfully.`, false);
+        } catch (error) {
+            showMessage(`Error: ${error.message}`, true);
+        } finally { hideLoading(); }
+    }
+
+    function resetView() {
+        camera.position.copy(initialCameraPosition);
+        controls.target.copy(initialControlsTarget);
+        controls.update();
+    }
+
+    loadPdbButton.addEventListener('click', loadPdb);
+    resetViewButton.addEventListener('click', resetView);
+    renderModeRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (loadedAtoms.length > 0) {
+                renderMolecule(loadedAtoms, radio.value);
+                showMessage(`Render mode changed to ${radio.value}.`, false);
+            }
+        });
+    });
   </script>
 
   <!-- Vanta.js for the animated background -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
   <script>
-    VANTA.NET({
-      el: document.body,
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0x00f7ff,
-      backgroundColor: 0x000000,
-      points: 15.00,
-      maxDistance: 14.00,
-      spacing: 18.00
-    });
+    // --- Window Onload Logic (MERGED) ---
+    window.onload = () => {
+      // From original index.html
+      runMatrix().then(() => animateInnovationText());
+      setupTeamScrollAnimation();
+      setupGlitchEffect();
+      setupInnovationImageScrollEffect();
+      autoScrollInnovationImages();
+
+      // From pdbviewer.html
+      initPdbViewer();
+
+      // Vanta background
+      VANTA.NET({
+        el: document.body,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0x00f7ff,
+        backgroundColor: 0x000000,
+        points: 15.00,
+        maxDistance: 14.00,
+        spacing: 18.00
+      });
+    };
   </script>
 </body>
 </html>
