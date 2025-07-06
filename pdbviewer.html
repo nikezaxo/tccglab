@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix PDB 3D Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js OrbitControls for camera interaction -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Three.js Post-processing Libraries for Bloom Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+
+    <style>
+        /* Matrix Theme Colors */
+        :root {
+            --matrix-green: #42d9e4;
+            --matrix-dark-green: #1a3438;
+            --matrix-black: #000000;
+            --matrix-dark-grey: #0a0a0a;
+            --matrix-light-grey: #cccccc;
+            --matrix-blue: #fbfbfc; /* For protein default */
+            --matrix-yellow: #ffff00; /* For ligand default */
+        }
+
+        body {
+            font-family: 'Inter', monospace, sans-serif; /* Monospace for digital feel */
+            background-color: var(--matrix-black);
+            background-image: radial-gradient(circle at top left, rgba(0, 255, 0, 0.05) 0%, transparent 50%),
+                              radial-gradient(circle at bottom right, rgba(0, 255, 0, 0.05) 0%, transparent 50%);
+            margin: 0;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--matrix-green); /* Default text color */
+            overflow-y: auto; /* Ensure scrolling is enabled */
+        }
+        .container {
+            background-color: rgba(0, 50, 0, 0.15); /* Dark green transparent */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            padding: 2.5rem;
+            border-radius: 1.25rem; /* rounded-2xl */
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4), inset 0 0 10px rgba(0, 255, 0, 0.2); /* Green glow */
+            text-align: center;
+            width: 95%;
+            max-width: 900px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 255, 0, 0.3); /* Subtle green border */
+        }
+        h1 {
+            font-size: 2.8rem; /* Larger title */
+            font-weight: 700;
+            color: var(--matrix-green);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Stronger glow */
+            letter-spacing: 0.1em; /* Spaced out for digital feel */
+        }
+        p {
+            font-size: 1.125rem;
+            color: var(--matrix-light-grey); /* Slightly lighter for readability */
+            margin-bottom: 1.5rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        input[type="text"] {
+            padding: 0.85rem 1.25rem;
+            border: 1px solid var(--matrix-green);
+            border-radius: 0.75rem;
+            background-color: rgba(0, 20, 0, 0.8); /* Very dark green background */
+            color: var(--matrix-green);
+            font-size: 1rem;
+            flex-grow: 1;
+            max-width: 300px;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8), inset 0 0 8px rgba(0, 255, 0, 0.5);
+        }
+        button {
+            padding: 0.85rem 1.75rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em; /* More spacing */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); /* Initial glow */
+            background-color: rgba(0, 100, 0, 0.5); /* Dark green button background */
+            color: var(--matrix-green);
+            border: 1px solid var(--matrix-green);
+        }
+        button:hover {
+            background-color: rgba(0, 150, 0, 0.7); /* Brighter green on hover */
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.9); /* Stronger glow on hover */
+            transform: translateY(-3px); /* More pronounced lift */
+        }
+
+        .render-options, .color-options, .info-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(0, 50, 0, 0.1); /* Lighter transparent green */
+            border-radius: 0.75rem;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            color: var(--matrix-light-grey);
+            font-size: 0.95rem;
+        }
+
+        .render-option-item, .color-option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: var(--matrix-light-grey);
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .render-option-item:hover, .color-option-item:hover {
+            color: var(--matrix-green);
+        }
+        .render-option-item input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--matrix-green); /* Green border */
+            border-radius: 50%;
+            background-color: transparent;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3); /* Subtle glow */
+        }
+        .render-option-item input[type="radio"]:checked {
+            background-color: var(--matrix-green);
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.6); /* Stronger glow when checked */
+        }
+        .render-option-item input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background-color: var(--matrix-black); /* Black dot inside green */
+        }
+
+        /* Styling for color input */
+        .color-option-item input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 2.5rem; /* Larger size */
+            height: 1.5rem;
+            background: none;
+            border: 2px solid var(--matrix-green);
+            border-radius: 0.3rem; /* Slightly rounded corners */
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden; /* Hide default color picker border */
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+            transition: box-shadow 0.2s ease;
+        }
+        .color-option-item input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-option-item input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 0.2rem;
+        }
+        .color-option-item input[type="color"]::-moz-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-option-item input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 0.2rem;
+        }
+        .color-option-item input[type="color"]:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+        }
+
+        .info-box {
+            text-align: left;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            color: var(--matrix-light-grey);
+        }
+        .info-box h2 {
+            font-size: 1.3rem;
+            color: var(--matrix-green);
+            margin-bottom: 0.8rem;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        .info-box p, .info-box ul {
+            margin-bottom: 0.5rem;
+        }
+        .info-box ul {
+            list-style: none; /* Remove default bullet points */
+            padding-left: 0;
+            max-height: 150px; /* Limit height for long lists */
+            overflow-y: auto; /* Allow scrolling for ligand list */
+            border: 1px solid rgba(0, 255, 0, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(0, 20, 0, 0.5);
+        }
+        .info-box li {
+            padding: 0.2rem 0;
+            border-bottom: 1px dashed rgba(0, 255, 0, 0.1);
+        }
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+
+        #messageBox {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            animation: fadeIn 0.5s ease-out;
+            border: 1px solid; /* Add border for consistency */
+        }
+        #messageBox.text-red-600 {
+            background-color: rgba(139, 0, 0, 0.5); /* Darker red transparent */
+            color: #ff6666; /* Lighter red text */
+            border-color: #ff0000;
+        }
+        #messageBox.text-green-600 {
+            background-color: rgba(0, 100, 0, 0.5); /* Darker green transparent */
+            color: var(--matrix-green);
+            border-color: var(--matrix-green);
+        }
+
+        /* Canvas styling */
+        #pdb3dCanvas { /* Reverted to original ID for 3D canvas */
+            display: block;
+            background-color: var(--matrix-dark-grey); /* Very dark background for the 3D scene */
+            border-radius: 1.25rem;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.6), inset 0 0 10px rgba(0, 255, 0, 0.3); /* Strong green glow */
+            margin-top: 2rem;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            width: 95vw;
+            max-width: 900px;
+            height: 70vh;
+            max-height: 700px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95); /* Almost opaque black */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--matrix-green);
+            font-size: 1.8rem;
+            z-index: 1000;
+            text-shadow: 1px 1px 5px rgba(0, 255, 0, 0.7);
+        }
+        .spinner {
+            border: 8px solid rgba(0, 255, 0, 0.2); /* Transparent green */
+            border-top: 8px solid var(--matrix-green); /* Solid green */
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1.2s linear infinite; /* Faster spin */
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Glow on spinner */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            p {
+                font-size: 1rem;
+            }
+            .input-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            input[type="text"], button {
+                width: 100%;
+                max-width: none;
+            }
+            .render-options, .color-options {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            #pdb3dCanvas {
+                margin-top: 1.5rem;
+                width: 98vw;
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDB 3D Viewer // System Online</h1>
+        <p>Accessing molecular structures from the RCSB PDB database. Select visualization mode.</p>
+        <div class="input-group">
+            <input type="text" id="pdbIdInput" placeholder="Enter PDB ID (e.g., 1CRN, 4HHB)">
+            <button id="loadPdbButton">Load PDB // Execute</button>
+            <button id="resetViewButton">Reset View // Recalibrate</button>
+        </div>
+
+        <div class="render-options">
+            <label class="render-option-item">
+                <input type="radio" name="renderMode" value="line" checked>
+                Line // ViewDefault
+            <label class="render-option-item">
+                <input type="radio" name="renderMode" value="ballAndStick">
+                Ball-and-Stick // Skeletal View
+            </label>
+            <label class="render-option-item">
+                <input type="radio" name="renderMode" value="spaceFilling">
+                Space-Filling // CPK Volume
+            </label>
+            <label class="render-option-item">
+                <input type="radio" name="renderMode" value="wireframe">
+                Wireframe // Mesh Outline
+            </label>
+
+        </div>
+
+        <!-- Removed color options as requested -->
+
+        <div id="messageBox" class="mt-4 hidden"></div>
+
+        <div id="pdbInfoBox" class="info-box hidden">
+            <h2>PDB Data // Analysis Report</h2>
+            <p id="atomCountInfo"></p>
+            <p id="ligandCountInfo"></p>
+            <ul id="ligandList"></ul>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Loading PDB data // Initiating Protocol...</p>
+    </div>
+
+    <canvas id="pdb3dCanvas"></canvas> <!-- Only 3D Canvas -->
+
+    <script>
+        // --- Three.js Global Variables ---
+        let scene, camera, renderer, controls;
+        let composer; // For post-processing effects
+        let initialCameraPosition = new THREE.Vector3(0, 0, 50); // Default camera position
+        let initialControlsTarget = new THREE.Vector3(0, 0, 0); // Default camera target
+        let loadedAtoms = []; // Store parsed atoms for re-rendering
+
+        // --- DOM Elements ---
+        const pdbIdInput = document.getElementById('pdbIdInput');
+        const loadPdbButton = document.getElementById('loadPdbButton');
+        const resetViewButton = document.getElementById('resetViewButton');
+        const pdb3dCanvas = document.getElementById('pdb3dCanvas');
+        const messageBox = document.getElementById('messageBox');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const renderModeRadios = document.querySelectorAll('input[name="renderMode"]');
+        // Removed proteinColorModeRadios, proteinColorInput, ligandColorInput
+        const pdbInfoBox = document.getElementById('pdbInfoBox');
+        const atomCountInfo = document.getElementById('atomCountInfo');
+        const ligandCountInfo = document.getElementById('ligandCountInfo');
+        const ligandList = document.getElementById('ligandList');
+
+        // --- Molecular Data Constants ---
+        // Atom radii for Ball-and-Stick model (scaled for visual clarity)
+        const ATOM_RADII_BALL_AND_STICK = {
+            'H': 0.25, 'C': 0.70, 'N': 0.65, 'O': 0.60, 'S': 1.00, 'P': 0.95,
+            'F': 0.60, 'Cl': 1.00, 'Br': 1.15, 'I': 1.40, 'He': 0.50, 'Ne': 0.70,
+            'Ar': 0.90, 'Kr': 1.00, 'Xe': 1.10, 'Li': 1.45, 'Na': 1.80, 'K': 2.20,
+            'Rb': 2.35, 'Cs': 2.60, 'Mg': 1.50, 'Ca': 1.80, 'Fe': 1.25, 'Zn': 1.35,
+            'UNKNOWN': 0.7
+        };
+
+        // Atom radii for Space-Filling (CPK) model (van der Waals radii in Angstroms)
+        const ATOM_RADII_SPACE_FILLING = {
+            'H': 1.20, 'C': 1.70, 'N': 1.55, 'O': 1.52, 'S': 1.80, 'P': 1.80,
+            'F': 1.47, 'Cl': 1.75, 'Br': 1.85, 'I': 1.98, 'He': 1.40, 'Ne': 1.54,
+            'Ar': 1.88, 'Kr': 2.02, 'Xe': 2.16, 'Li': 1.82, 'Na': 2.27, 'K': 2.75,
+            'Rb': 2.95, 'Cs': 3.43, 'Mg': 1.73, 'Ca': 2.31, 'Fe': 1.25, 'Zn': 1.39,
+            'UNKNOWN': 1.7
+        };
+
+        // Atom radii for Line model (very small spheres)
+        const ATOM_RADII_LINE = {
+            'H': 0.1, 'C': 0.1, 'N': 0.1, 'O': 0.1, 'S': 0.1, 'P': 0.1,
+            'F': 0.1, 'Cl': 0.1, 'Br': 0.1, 'I': 0.1, 'He': 0.1, 'Ne': 0.1,
+            'Ar': 0.1, 'Kr': 0.1, 'Xe': 0.1, 'Li': 0.1, 'Na': 0.1, 'K': 0.1,
+            'Rb': 0.1, 'Cs': 0.1, 'Mg': 0.1, 'Ca': 0.1, 'Fe': 0.1, 'Zn': 0.1,
+            'UNKNOWN': 0.1
+        };
+
+        const MATRIX_GREEN_COLOR = 0x00FF00; // Bright green for wireframe/line
+        const BOND_RADIUS = 0.15; // Radius for bond cylinders in Ball-and-Stick
+        const BOND_THRESHOLD = 1.8; // Max distance for a covalent bond (Angstroms)
+
+        // PyMOL-like CPK Colors (hexadecimal values) - more vibrant
+        const PYMOL_CPK_COLORS = {
+            'C': 0xC0C0C0, // Light Grey (Carbon) - slightly brighter
+            'O': 0xFF0000, // Red (Oxygen)
+            'N': 0x0000FF, // Blue (Nitrogen)
+            'S': 0xFFFF00, // Yellow (Sulfur) - more pure yellow
+            'P': 0xFF8C00, // Dark Orange (Phosphorus) - slightly darker
+            'H': 0xFFFFFF, // White (Hydrogen)
+            'F': 0x00FF00, // Green (Fluorine) - more pure green
+            'Cl': 0x00FF00, // Green (Chlorine) - more pure green
+            'Br': 0x8B4513, // Saddle Brown (Bromine) - more distinct brown
+            'I': 0x9400D3, // Dark Violet (Iodine) - more distinct purple
+            'Fe': 0xD2691E, // Chocolate (Iron) - more distinct orange-brown
+            'Zn': 0x708090, // Slate Gray (Zinc) - slightly darker grey
+            'Na': 0x0000CD, // Medium Blue (Sodium) - slightly darker blue
+            'K': 0x8A2BE2, // Blue Violet (Potassium) - more distinct purple
+            'Ca': 0x696969, // Dim Gray (Calcium) - slightly darker grey
+            'Mg': 0x006400, // Dark Green (Magnesium) - slightly darker green
+            'UNKNOWN': 0xAAAAAA // Default for unknown elements - slightly darker
+        };
+
+        // Fixed ligand color
+        const LIGAND_COLOR = new THREE.Color(0xFF0000); // Red
+
+        // --- Core Three.js Functions ---
+
+        /**
+         * Initializes the Three.js scene, camera, renderer, and OrbitControls.
+         * Sets up initial lighting and event listeners.
+         */
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000); // Pure black background for better glow contrast
+
+            camera = new THREE.PerspectiveCamera(75, pdb3dCanvas.clientWidth / pdb3dCanvas.clientHeight, 0.1, 1000);
+            camera.position.copy(initialCameraPosition);
+
+            renderer = new THREE.WebGLRenderer({ canvas: pdb3dCanvas, antialias: true });
+            renderer.setSize(pdb3dCanvas.clientWidth, pdb3dCanvas.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color mapping
+            renderer.toneMappingExposure = 1.2; // Adjust exposure for bloom
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 5;
+            controls.maxDistance = 500;
+            controls.target.copy(initialControlsTarget);
+
+            // Lights for the Matrix theme
+            const ambientLight = new THREE.AmbientLight(0x606060); // General ambient light
+            scene.add(ambientLight);
+
+            const directionalLight1 = new THREE.DirectionalLight(0x00FF00, 0.5); // Green light
+            directionalLight1.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight1);
+
+            const directionalLight2 = new THREE.DirectionalLight(0xFFFFFF, 0.3);
+            directionalLight2.position.set(-1, -1, -1).normalize();
+            scene.add(directionalLight2);
+
+            currentMoleculeGroup = new THREE.Group();
+            scene.add(currentMoleculeGroup);
+
+            // --- Post-processing setup for Bloom ---
+            composer = new THREE.EffectComposer(renderer);
+            const renderPass = new THREE.RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            // Adjusted bloom parameters for better visibility of white
+            // Strength slightly reduced, radius and threshold adjusted for less "blown out" look
+            const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(pdb3dCanvas.clientWidth, pdb3dCanvas.clientHeight), 0.7, 0.3, 0.7);
+            composer.addPass(bloomPass);
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            animate();
+        }
+
+        /**
+         * Adjusts camera aspect ratio and renderer size on window resize.
+         */
+        function onWindowResize() {
+            const canvas3dComputedWidth = pdb3dCanvas.clientWidth;
+            const canvas3dComputedHeight = pdb3dCanvas.clientHeight;
+            renderer.setSize(canvas3dComputedWidth, canvas3dComputedHeight);
+            camera.aspect = canvas3dComputedWidth / canvas3dComputedHeight;
+            camera.updateProjectionMatrix();
+            composer.setSize(canvas3dComputedWidth, canvas3dComputedHeight);
+        }
+
+        /**
+         * The main animation loop for Three.js. Continuously renders the scene.
+         */
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            composer.render(); // Render using the composer for post-processing
+        }
+
+        // --- UI Utility Functions ---
+
+        /**
+         * Displays a message in the designated message box.
+         * @param {string} message - The text content of the message.
+         * @param {boolean} isError - If true, styles the message as an error.
+         */
+        function showMessage(message, isError = false) {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden');
+            if (isError) {
+                messageBox.classList.add('text-red-600');
+                messageBox.classList.remove('text-green-600');
+            } else {
+                messageBox.classList.add('text-green-600');
+                messageBox.classList.remove('text-red-600');
+            }
+        }
+
+        /**
+         * Hides the message box.
+         */
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+        }
+
+        /**
+         * Shows the loading overlay with spinner and text.
+         */
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the loading overlay.
+         */
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        // --- PDB Data Handling Functions ---
+
+        /**
+         * Fetches PDB data from the RCSB PDB website.
+         * @param {string} pdbId - The PDB ID to fetch.
+         * @returns {Promise<string>} - A promise resolving with the PDB file content as a string.
+         * @throws {Error} If the fetch fails or PDB ID is not found/invalid.
+         */
+        async function fetchPdbData(pdbId) {
+            const url = `https://files.rcsb.org/download/${pdbId.toUpperCase()}.pdb`;
+            console.log(`Attempting to fetch PDB data from: ${url}`);
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error(`PDB ID "${pdbId}" not found. Please verify the ID.`);
+                    }
+                    throw new Error(`Network error: ${response.statusText}`);
+                }
+                const text = await response.text();
+                if (text.includes("Invalid PDB ID") || text.includes("File not found")) {
+                    throw new Error(`PDB ID "${pdbId}" is invalid or does not exist on RCSB PDB.`);
+                }
+                console.log(`Successfully fetched PDB data for ${pdbId}. Text length: ${text.length}`);
+                return text;
+            } catch (error) {
+                console.error("Error fetching PDB data:", error);
+                throw error;
+            }
+        }
+
+        /**
+         * Parses the raw PDB text content to extract atom coordinates, element types,
+         * and identify if it's a HETATM (ligand/water) or ATOM (protein/nucleic acid).
+         * Also collects ligand names.
+         * @param {string} pdbText - The full content of the PDB file.
+         * @returns {Object} - An object containing an array of atom objects and an array of ligands.
+         */
+        function parsePdb(pdbText) {
+            const atoms = [];
+            const ligandsMap = new Map(); // Map to store unique ligand names and their counts
+            const lines = pdbText.split('\n');
+
+            for (const line of lines) {
+                const recordType = line.substring(0, 6).trim();
+                if (recordType === 'ATOM' || recordType === 'HETATM') {
+                    const x = parseFloat(line.substring(30, 38));
+                    const y = parseFloat(line.substring(38, 46));
+                    const z = parseFloat(line.substring(46, 54));
+                    const element = line.substring(76, 78).trim();
+                    const resName = line.substring(17, 20).trim(); // Residue name
+
+                    if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+                        const isHETATM = (recordType === 'HETATM');
+                        atoms.push({ x, y, z, element, isHETATM, resName });
+
+                        if (isHETATM) {
+                            // Collect ligand names, excluding common water molecules (HOH)
+                            if (resName !== 'HOH') {
+                                ligandsMap.set(resName, (ligandsMap.get(resName) || 0) + 1);
+                            }
+                        }
+                    }
+                }
+            }
+            console.log(`Parsed ${atoms.length} atoms and ${ligandsMap.size} unique ligands.`);
+            return { atoms, ligands: Array.from(ligandsMap.entries()) }; // Return atoms and ligands
+        }
+
+        /**
+         * Renders the 3D molecular structure (atoms and bonds) in the Three.js scene
+         * based on the selected rendering mode and user-defined colors.
+         * @param {Array<Object>} atoms - An array of atom objects.
+         * @param {string} mode - The rendering mode ('ballAndStick', 'spaceFilling', 'wireframe', 'line').
+         */
+        function renderMolecule(atoms, mode) {
+            console.log('Rendering molecule with mode:', mode, 'and atoms count:', atoms.length);
+
+            // Clear any previously loaded molecule from the scene
+            if (currentMoleculeGroup) {
+                scene.remove(currentMoleculeGroup);
+                currentMoleculeGroup.children.forEach(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                });
+                currentMoleculeGroup = null;
+            }
+
+            currentMoleculeGroup = new THREE.Group();
+            scene.add(currentMoleculeGroup);
+            console.log('New currentMoleculeGroup created and added to scene.');
+
+            let currentAtomRadii;
+            let wireframeEnabled = false;
+            let renderBondsAsCylinders = false;
+            let renderBondsAsLines = false;
+
+            // Colors are now fixed as per request
+            const proteinColor = new THREE.Color(); // Will be set per atom based on CPK
+            const ligandColor = LIGAND_COLOR; // Fixed red for ligands
+
+
+            switch (mode) {
+                case 'ballAndStick':
+                    currentAtomRadii = ATOM_RADII_BALL_AND_STICK;
+                    renderBondsAsCylinders = true;
+                    break;
+                case 'spaceFilling':
+                    currentAtomRadii = ATOM_RADII_SPACE_FILLING;
+                    break;
+                case 'wireframe':
+                    currentAtomRadii = ATOM_RADII_BALL_AND_STICK;
+                    wireframeEnabled = true;
+                    renderBondsAsCylinders = true;
+                    break;
+                case 'line':
+                    currentAtomRadii = ATOM_RADII_LINE;
+                    renderBondsAsLines = true;
+                    break;
+                default: // Default to ballAndStick if mode is not recognized
+                    currentAtomRadii = ATOM_RADII_BALL_AND_STICK;
+                    renderBondsAsCylinders = true;
+            }
+
+            // --- Render Atoms using InstancedMesh for performance ---
+            if (mode === 'ballAndStick' || mode === 'spaceFilling' || mode === 'wireframe') {
+                const sphereGeometry = new THREE.SphereGeometry(1, 32, 32); // Base geometry, radius will be scaled per instance
+                const dummy = new THREE.Object3D(); // Helper object for setting instance transforms
+
+                let instancedMaterial;
+                if (mode === 'wireframe') {
+                    instancedMaterial = new THREE.MeshBasicMaterial({ color: MATRIX_GREEN_COLOR, wireframe: true });
+                } else {
+                    instancedMaterial = new THREE.MeshPhongMaterial({
+                        shininess: 50,
+                        specular: 0x111111,
+                        emissive: 0x101010, // Increased emissive for better visibility
+                        vertexColors: true // Enable per-instance coloring
+                    });
+                }
+
+                const instancedAtoms = new THREE.InstancedMesh(sphereGeometry, instancedMaterial, atoms.length);
+                instancedAtoms.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+                
+                if (mode !== 'wireframe') {
+                    const colors = new Float32Array(atoms.length * 3);
+                    instancedAtoms.instanceColor = new THREE.InstancedBufferAttribute(colors, 3);
+                }
+
+                atoms.forEach((atom, i) => {
+                    const radius = currentAtomRadii[atom.element] || currentAtomRadii['UNKNOWN'];
+                    let atomColor;
+
+                    if (atom.isHETATM) {
+                        atomColor = ligandColor; // Ligands always use the fixed ligand color
+                    } else {
+                        // Protein atoms always use PyMOL CPK colors
+                        atomColor = new THREE.Color(PYMOL_CPK_COLORS[atom.element] || PYMOL_CPK_COLORS['UNKNOWN']);
+                    }
+
+                    dummy.position.set(atom.x, atom.y, atom.z);
+                    dummy.scale.set(radius, radius, radius);
+                    dummy.updateMatrix();
+                    instancedAtoms.setMatrixAt(i, dummy.matrix);
+
+                    if (mode !== 'wireframe') {
+                        instancedAtoms.instanceColor.setXYZ(i, atomColor.r, atomColor.g, atomColor.b);
+                    }
+                });
+
+                instancedAtoms.instanceMatrix.needsUpdate = true;
+                if (mode !== 'wireframe') {
+                    instancedAtoms.instanceColor.needsUpdate = true;
+                }
+                currentMoleculeGroup.add(instancedAtoms);
+                console.log(`Added InstancedMesh with ${atoms.length} instances.`);
+
+            } else if (mode === 'line') {
+                for (const atom of atoms) {
+                    const radius = ATOM_RADII_LINE[atom.element] || ATOM_RADII_LINE['UNKNOWN'];
+                    const geometry = new THREE.SphereGeometry(radius, 8, 8);
+                    const material = new THREE.MeshBasicMaterial({ color: MATRIX_GREEN_COLOR });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(atom.x, atom.y, atom.z);
+                    currentMoleculeGroup.add(sphere);
+                }
+                console.log(`Added individual spheres for line mode (${atoms.length} atoms).`);
+            }
+
+            // --- Render Bonds ---
+            if (renderBondsAsCylinders) {
+                let bondCount = 0;
+                for (let i = 0; i < atoms.length; i++) {
+                    for (let j = i + 1; j < atoms.length; j++) {
+                        const atom1 = atoms[i];
+                        const atom2 = atoms[j];
+
+                        const dist = Math.sqrt(
+                            Math.pow(atom1.x - atom2.x, 2) +
+                            Math.pow(atom1.y - atom2.y, 2) +
+                            Math.pow(atom1.z - atom2.z, 2)
+                        );
+
+                        if (dist < BOND_THRESHOLD) {
+                            const startPoint = new THREE.Vector3(atom1.x, atom1.y, atom1.z);
+                            const endPoint = new THREE.Vector3(atom2.x, atom2.y, atom2.z);
+
+                            const midPoint = new THREE.Vector3().addVectors(startPoint, endPoint).multiplyScalar(0.5);
+
+                            const cylinderGeometry = new THREE.CylinderGeometry(BOND_RADIUS, BOND_RADIUS, dist, 8);
+                            let cylinderMaterial;
+                            if (wireframeEnabled) {
+                                cylinderMaterial = new THREE.MeshBasicMaterial({ color: MATRIX_GREEN_COLOR, wireframe: true });
+                            } else {
+                                cylinderMaterial = new THREE.MeshPhongMaterial({ color: 0xCCCCCC, shininess: 20, emissive: 0x000500 });
+                            }
+                            const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+
+                            cylinder.position.copy(midPoint);
+                            cylinder.lookAt(endPoint);
+                            cylinder.rotateX(Math.PI / 2);
+
+                            currentMoleculeGroup.add(cylinder);
+                            bondCount++;
+                        }
+                    }
+                }
+                console.log(`Added ${bondCount} bonds (cylinders).`);
+            } else if (renderBondsAsLines) {
+                const points = [];
+                let lineBondCount = 0;
+                for (let i = 0; i < atoms.length; i++) {
+                    for (let j = i + 1; j < atoms.length; j++) {
+                        const atom1 = atoms[i];
+                        const atom2 = atoms[j];
+
+                        const dist = Math.sqrt(
+                            Math.pow(atom1.x - atom2.x, 2) +
+                            Math.pow(atom1.y - atom2.y, 2) +
+                            Math.pow(atom1.z - atom2.z, 2)
+                        );
+
+                        if (dist < BOND_THRESHOLD) {
+                            points.push(new THREE.Vector3(atom1.x, atom1.y, atom1.z));
+                            points.push(new THREE.Vector3(atom2.x, atom2.y, atom2.z));
+                            lineBondCount++;
+                        }
+                    }
+                }
+                if (points.length > 0) {
+                    const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const lineMaterial = new THREE.LineBasicMaterial({ color: MATRIX_GREEN_COLOR, linewidth: 2 });
+                    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+                    currentMoleculeGroup.add(lines);
+                    console.log(`Added ${lineBondCount} bonds (lines).`);
+                }
+            }
+
+            // --- Adjust Camera and Controls to Fit Molecule ---
+            if (atoms.length > 0) {
+                const boundingBox = new THREE.Box3().setFromObject(currentMoleculeGroup);
+                const center = new THREE.Vector3();
+                boundingBox.getCenter(center);
+
+                currentMoleculeGroup.position.sub(center);
+                console.log('Molecule group recentered by:', center);
+
+                const size = new THREE.Vector3();
+                boundingBox.getSize(size);
+                const maxDim = Math.max(size.x, size.y, size.z);
+
+                console.log('Molecule bounding box size (after recentering):', size, 'maxDim:', maxDim);
+
+                const fov = camera.fov * (Math.PI / 180);
+                let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                cameraZ *= 1.8;
+
+                camera.position.set(0, 0, cameraZ);
+                controls.target.set(0, 0, 0);
+                controls.update();
+
+                initialCameraPosition.copy(camera.position);
+                initialControlsTarget.copy(controls.target);
+                console.log('Camera positioned at:', camera.position, 'Controls target:', controls.target);
+            } else {
+                console.log('No atoms to render, resetting camera and controls.');
+                resetCameraAndControls();
+            }
+        }
+
+        /**
+         * Resets the camera position and controls target to their initial states.
+         */
+        function resetCameraAndControls() {
+            camera.position.copy(initialCameraPosition);
+            controls.target.copy(initialControlsTarget);
+            controls.update();
+            console.log('Camera and controls reset to initial positions.');
+        }
+
+        /**
+         * Displays information about the loaded PDB, including atom count and ligands.
+         * @param {Array<Object>} atoms - The parsed atom data.
+         * @param {Array<Array>} ligands - An array of [ligandName, count] pairs.
+         */
+        function displayPdbInfo(atoms, ligands) {
+            pdbInfoBox.classList.remove('hidden');
+            atomCountInfo.textContent = `Total Atoms: ${atoms.length} // Data Points`;
+
+            const totalUniqueLigands = ligands.length;
+            const totalLigandMolecules = ligands.reduce((sum, [, count]) => sum + count, 0);
+
+            if (totalUniqueLigands > 0) {
+                ligandCountInfo.textContent = `Unique Ligands: ${totalUniqueLigands} // Total Ligand Molecules: ${totalLigandMolecules}`;
+                ligandList.innerHTML = ''; // Clear previous list
+                ligands.forEach(([name, count]) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `> ${name} (Count: ${count})`;
+                    ligandList.appendChild(listItem);
+                });
+            } else {
+                ligandCountInfo.textContent = `No Significant Ligands Detected // No External Modules`;
+                ligandList.innerHTML = '';
+            }
+        }
+
+        // --- Event Listeners ---
+
+        /**
+         * Event listener for the "Load PDB" button click.
+         * Fetches, parses, and renders the PDB structure.
+         */
+        loadPdbButton.addEventListener('click', async () => {
+            const pdbId = pdbIdInput.value.trim();
+            if (!pdbId) {
+                showMessage("Please enter a PDB ID to load // Input Required.", true);
+                return;
+            }
+
+            hideMessage();
+            hidePdbInfo(); // Hide info box until new data is loaded
+            showLoading();
+            console.log(`Load PDB button clicked for ID: ${pdbId}`);
+
+            try {
+                const pdbText = await fetchPdbData(pdbId);
+                const parsedData = parsePdb(pdbText);
+                loadedAtoms = parsedData.atoms; // Store parsed atoms
+                const ligands = parsedData.ligands;
+
+                if (loadedAtoms.length === 0) {
+                    showMessage(`No valid atom data found for PDB ID: ${pdbId} // Data Corrupted.`, true);
+                    if (currentMoleculeGroup) {
+                        scene.remove(currentMoleculeGroup);
+                        currentMoleculeGroup.children.forEach(child => child.geometry.dispose());
+                        currentMoleculeGroup.children.forEach(child => child.material.dispose());
+                        currentMoleculeGroup = null;
+                    }
+                    resetCameraAndControls();
+                } else {
+                    const selectedMode = document.querySelector('input[name="renderMode"]:checked').value;
+                    renderMolecule(loadedAtoms, selectedMode); // Render with selected mode
+                    displayPdbInfo(loadedAtoms, ligands); // Display PDB info
+                    showMessage(`Successfully loaded PDB ID: ${pdbId} with ${loadedAtoms.length} atoms // Render Complete.`, false);
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message} // Protocol Aborted.`, true);
+                console.error("Load PDB Error:", error);
+                if (currentMoleculeGroup) {
+                    scene.remove(currentMoleculeGroup);
+                    currentMoleculeGroup.children.forEach(child => child.geometry.dispose());
+                    currentMoleculeGroup.children.forEach(child => child.material.dispose());
+                    currentMoleculeGroup = null;
+                }
+                loadedAtoms = []; // Clear loaded atoms on error
+                hidePdbInfo(); // Hide info box on error
+                resetCameraAndControls();
+            } finally {
+                hideLoading();
+                console.log('Loading process finished.');
+            }
+        });
+
+        /**
+         * Event listener for the "Reset View" button click.
+         * Calls the function to reset camera and controls.
+         */
+        resetViewButton.addEventListener('click', resetCameraAndControls);
+
+        /**
+         * Event listeners for rendering mode radio buttons.
+         * Re-renders the molecule if one is already loaded.
+         */
+        renderModeRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                const selectedMode = event.target.value;
+                console.log(`Render mode changed to: ${selectedMode}`);
+                if (loadedAtoms.length > 0) {
+                    renderMolecule(loadedAtoms, selectedMode);
+                    showMessage(`Rendering mode changed to: ${event.target.labels[0].textContent.replace('//.*', '').trim()} // View Updated.`, false);
+                }
+            });
+        });
+
+        // Removed proteinColorModeRadios event listener as the options are removed
+        // Removed proteinColorInput event listener as the options are removed
+        // Removed ligandColorInput event listener as the options are removed
+
+        function hidePdbInfo() {
+            pdbInfoBox.classList.add('hidden');
+            atomCountInfo.textContent = '';
+            ligandCountInfo.textContent = '';
+            ligandList.innerHTML = '';
+        }
+
+        // --- Initial Setup ---
+        window.onload = () => {
+            init();
+            onWindowResize(); // Set initial canvas size correctly
+            hidePdbInfo(); // Ensure info box is hidden on initial load
+        };
+    </script>
+</body>
+</html>
