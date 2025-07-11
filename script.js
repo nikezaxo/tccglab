@@ -390,6 +390,24 @@ renderModeRadios.forEach(radio => {
     });
 });
 
+// Function to handle redirection with loading effect
+function redirectToSketcher() {
+  console.log('redirectToSketcher function called.'); // Debugging line
+  const loadingOverlay = document.getElementById('global-loading-overlay');
+  if (loadingOverlay) {
+    loadingOverlay.classList.remove('hidden'); // Show loading overlay
+    console.log('Loading overlay shown.'); // Debugging line
+  } else {
+    console.error('Loading overlay element not found!'); // Debugging line
+  }
+
+  setTimeout(() => {
+    console.log('Redirecting to index2.html...'); // Debugging line
+    window.location.href = 'index2.html'; // Redirect after a short delay
+  }, 500); // 500ms delay for the loading animation to be visible
+}
+
+
 // --- Window Onload Logic (MERGED) ---
 window.onload = () => {
   // From original index.html
