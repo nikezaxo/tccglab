@@ -33,6 +33,8 @@
     <a href="#services">Services</a>
     <a href="#team">Team</a>
     <a href="#pdb-viewer-section">3D Viewer</a>
+    <!-- New button to redirect to index2.html with loading effect -->
+    <a href="javascript:void(0)" onclick="redirectToSketcher()">2D Molecule Editor</a>
     <a href="#contact">Contact</a>
     <a href="#location">Location</a>
   </nav>
@@ -156,7 +158,7 @@
 
   <div id="chatbot-modal" class="chatbot-modal">
       <div class="chatbot-modal-content">
-          <div class="chatbot-modal-header"><p>AI Assistant</p><span id="close-chatbot" class="close-chatbot">&times;</span></div>
+          <div class="chatbot-modal-header"><p>AI Assistant</p><span id="close-chatbot" class="close-chatbot">×</span></div>
           <div class="chatbot-iframe-container">
               <div id="chatbot-loading">Loading AI Assistant...</div>
               <iframe src="https://www.chatbase.co/chatbot-iframe/7nAceRz4VtIakEojiLmW3" title="Chatbot" onload="document.getElementById('chatbot-loading').style.display='none';"></iframe>
@@ -166,8 +168,14 @@
 
   <!-- Full Image Modal (Lightbox) -->
   <div id="fullImageModal" class="full-image-modal">
-    <span class="close-full-image-modal">&times;</span>
+    <span class="close-full-image-modal">×</span>
     <img class="full-image-modal-content" id="img01">
+  </div>
+
+  <!-- Global Loading Overlay for Page Transitions -->
+  <div id="global-loading-overlay" class="global-loading-overlay hidden">
+    <div class="spinner"></div>
+    <p>Loading 2D Editor...</p>
   </div>
 
   <!-- Scripts for PDB Viewer & Vanta -->
