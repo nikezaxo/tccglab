@@ -24,47 +24,59 @@
     }
     .pixel-logo span {
       font-family: 'Press Start 2P', cursive;
-      color: #00f7ff;
-      text-shadow: 2px 2px #00ffff;
       display: inline-block;
-      animation: pop 1s ease-in-out, glitch 2s infinite alternate;
+      text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff;
+      animation: flicker 1.5s infinite alternate;
     }
-    @keyframes pop {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    @keyframes glitch {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-2px); text-shadow: -2px 0 #f0f; }
-      40% { transform: translateX(2px); text-shadow: 2px 0 #0ff; }
+    .pixel-logo span:nth-child(even) { animation-delay: 0.1s; }
+    .pixel-logo span:nth-child(odd) { animation-delay: 0.05s; }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
     }
     button {
-      background: #00f7ff;
+      background: linear-gradient(45deg, #00f7ff, #00aaff);
       color: #000;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
       font-weight: bold;
-      padding: 0.75rem 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 247, 255, 0.6);
-      transition: transform 0.2s ease, background 0.3s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 247, 255, 0.4);
+      border: none;
+      cursor: pointer;
     }
     button:hover {
-      transform: scale(1.05);
-      background: #fff;
+      background: linear-gradient(45deg, #00aaff, #00f7ff);
+      box-shadow: 0 6px 20px rgba(0, 247, 255, 0.6);
+      transform: translateY(-2px);
     }
-    code {
-      display: block;
-      background: rgba(0,20,20,0.8);
+    #smiles-container {
+      background: rgba(0, 247, 255, 0.1);
+      border: 1px dashed #00f7ff;
       padding: 1rem;
-      border-radius: 10px;
-      border: 1px solid #00f7ff;
-      margin-top: 1rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+      word-break: break-all;
+    }
+    #smiles-output {
       color: #00f7ff;
-      font-family: monospace;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .glow-box { padding: 1rem; }
+      .pixel-logo { font-size: 2.5rem; }
+      h1 { font-size: 2rem; }
+      p { font-size: 0.9rem; }
+      button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+      #smiles-output { font-size: 0.8rem; }
     }
   </style>
 </head>
-<body>
-  <div class="max-w-5xl mx-auto">
+<body class="flex items-center justify-center min-h-screen">
+  <div class="text-center space-y-8 max-w-4xl mx-auto">
     <div class="text-center mb-8">
       <div class="pixel-logo text-4xl mb-2">
         <span>t</span><span>c</span><span>c</span><span>g</span><span>l</span><span>a</span><span>b</span>
@@ -88,23 +100,26 @@
   </div>
 
   <script>
+    // Initialize Kekule editor
     const editor = new Kekule.Editor.Composer(document.getElementById('chem-editor'));
     editor.setPredefinedSetting('fullFunc');
     editor.setChemObj(new Kekule.StructureFragment());
 
+    // Function to get SMILES string from the editor
     function getSmiles() {
       const mol = editor.getChemObj();
       if (mol) {
         const smiles = Kekule.IO.saveFormatData(mol, 'smi');
         document.getElementById('smiles-output').textContent = smiles;
       } else {
-        document.getElementById('smiles-output').textContent = 'No molecule built.';
+        document.getElementById('smiles-output').textContent = 'No molecule drawn yet.';
       }
     }
 
+    // Function to clear the editor
     function clearEditor() {
-      editor.setChemObj(new Kekule.StructureFragment());
-      document.getElementById('smiles-output').textContent = 'SMILES will appear here...';
+      editor.setChemObj(new Kekule.StructureFragment()); // Set an empty fragment
+      document.getElementById('smiles-output').textContent = 'SMILES will appear here...'; // Reset SMILES output
     }
   </script>
 </body>
